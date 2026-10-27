@@ -18,6 +18,16 @@ const rail = document.getElementById('rail');
 const sidebarToggle = document.getElementById('sidebarToggle');
 const topbarTitle = document.getElementById('topbarTitle');
 
+// Attachment button — opens file picker; shows filename next to button
+const attachBtn = document.getElementById('attachBtn');
+const fileInput = document.getElementById('fileInput');
+const attachLabel = document.getElementById('attachLabel');
+attachBtn.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', () => {
+  const f = fileInput.files[0];
+  attachLabel.textContent = f ? f.name : '';
+});
+
 // Session continuity (fix #6): a stable contextId threaded across turns (A2A 0.3.0).
 let contextId = null;
 let lastUserText = null;   // for retry (fix #5)
