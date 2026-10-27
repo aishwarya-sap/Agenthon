@@ -220,6 +220,15 @@ try:  # pragma: no cover - only when a2a-sdk is installed
             context.result = result  # type: ignore[attr-defined]
 
         async def cancel(self, context: RequestContext, event_queue: EventQueue) -> None:
-            raise Exception("cancel not supported")
+            task_id = getattr(context, "task_id", None) or getattr(context, "context_id", "unknown")
+            await event_queue.enqueue_event({
+                "jsonrpc": "2.0",
+                "id": task_id,
+                "result": {
+                    "id": task_id,
+                    "status": {"state": "cancelled"},
+                    "artifacts": [],
+                },
+            })
 except Exception:  # a2a-sdk absent offline — Starlette surface in main.py is used instead
     ProcurementAgentExecutor = None  # type: ignore

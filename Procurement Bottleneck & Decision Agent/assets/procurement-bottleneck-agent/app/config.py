@@ -112,6 +112,13 @@ def whoami_enabled() -> bool:
     return os.environ.get("ENABLE_WHOAMI", "").strip().lower() in ("1", "true")
 
 
+def cors_allowed_origins() -> list[str]:
+    """CORS allowed origins. Set CORS_ALLOWED_ORIGINS=<comma-separated> in CF manifest for prod.
+    Defaults to ['*'] (open) for local dev; must be locked to Joule/BTP origin before go-live."""
+    raw = os.environ.get("CORS_ALLOWED_ORIGINS", "").strip()
+    return [o.strip() for o in raw.split(",") if o.strip()] or ["*"]
+
+
 def is_mock_mode() -> bool:
     """True when the agent must run fully offline against deterministic fixtures."""
     return os.environ.get("IBD_TESTING", "").lower() in ("1", "true")

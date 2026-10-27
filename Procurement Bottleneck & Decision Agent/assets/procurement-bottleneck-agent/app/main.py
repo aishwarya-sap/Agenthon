@@ -3,7 +3,8 @@
 Routes (README §8):
 * ``GET  /``                       — chat UI (what a browser opening the base URL sees).
 * ``POST /``                       — A2A ``message/send`` (JSON-RPC) — same path A2A clients call.
-* ``GET  /.well-known/agent.json`` — A2A agent card (CF health-check target).
+* ``GET  /.well-known/agent-card.json`` — A2A agent card (CF health-check target).
+* ``GET  /.well-known/agent.json``      — alias kept for backwards compatibility.
 * ``GET  /ui``                     — alias of the chat UI (kept for older links).
 * ``GET  /health``                 — liveness probe; returns ``{"status":"ok","version":"..."}``.
   (Some SAP CF monitors / load balancers probe ``/health`` separately from the A2A card.)
@@ -241,14 +242,18 @@ def build_app():
         })
 
     app = Starlette(routes=[
-        Route("/.well-known/agent.json", agent_card, methods=["GET"]),
+        Route("/.well-known/agent-card.json", agent_card, methods=["GET"]),
+        Route("/.well-known/agent.json", agent_card, methods=["GET"]),  # backward-compat alias
         Route("/health", health, methods=["GET"]),
         Route("/", ui, methods=["GET"]),
         Route("/", message_endpoint, methods=["POST"]),
         Route("/ui", ui, methods=["GET"]),
         Route("/whoami", whoami, methods=["GET"]),
     ])
-    app.add_middleware(CORSMiddleware, allow_origins=["*"],
+    _cors_origins = [
+        o.strip() for o in os.environ.get("CORS_ALLOWED_ORIGINS", "").split(",") if o.strip()
+    ] or ["*"]  # default open for local dev; set CORS_ALLOWED_ORIGINS in CF manifest for production
+    app.add_middleware(CORSMiddleware, allow_origins=_cors_origins,
                        allow_methods=["GET", "POST", "OPTIONS"], allow_headers=["*"])
     return app
 
