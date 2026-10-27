@@ -1,0 +1,12 @@
+# CF upload excludes
+.venv/
+__pycache__/
+*.pyc
+tests/
+.coverage
+coverage.xml
+htmlcov/
+.pytest_cache/
+.env
+.env.local
+*.egg-info/

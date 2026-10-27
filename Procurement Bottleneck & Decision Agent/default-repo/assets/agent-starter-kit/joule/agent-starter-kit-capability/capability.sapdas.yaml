@@ -1,0 +1,15 @@
+# Joule pro-code capability (BYOA over A2A). Joule routes a matching user question
+# to the scenario, runs the function, which calls your remote CF agent over A2A
+# through the AGENT_STARTER_KIT system alias (-> a BTP destination of the same name).
+schema_version: 3.28.0            # 3.28.0 = minimum for the agent-request (A2A BYOA) action
+
+metadata:
+  namespace: joule.ext           # MUST be joule.ext, or deploy fails with a namespace error
+  name: agent_starter_kit_capability     # TODO: rename (underscore-separated)
+  version: 1.0.0
+  display_name: "Agent Starter Kit"       # TODO: rename
+  description: "[TODO: what this agent does — Joule uses this for intent matching]"
+
+system_aliases:
+  AGENT_STARTER_KIT:             # TODO: rename — referenced in functions/*.yaml
+    destination: AGENT_STARTER_KIT   # TODO: must match the BTP destination name exactly

@@ -1,0 +1,10 @@
+# Digital-assistant deployment descriptor — entry point for `joule compile` / `joule deploy`.
+# schema 1.4.0 is the DA-descriptor version required alongside capability schema 3.28.0.
+# Do NOT add enable_native_agenticness / conversational_search here (those need 1.5.0-beta
+# and break a 1.4.0 deploy).
+schema_version: 1.4.0
+name: procurement_bottleneck_capability   # must match capability metadata.name
+capabilities:
+  - type: local
+    name: procurement_bottleneck_capability
+    folder: ./procurement_bottleneck_capability

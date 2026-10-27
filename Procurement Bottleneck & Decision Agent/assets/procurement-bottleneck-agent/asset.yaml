@@ -1,0 +1,48 @@
+# SAP platform asset descriptor — Procurement Bottleneck & Decision Agent
+# Authored to the Joule 2.0 registration format: the ORD IDs below are the
+# registration keys, so no re-authoring is needed at migration.
+apiVersion: com.sap.ai/v1
+kind: agent
+metadata:
+  name: procurement-bottleneck-agent
+  title: Procurement Bottleneck & Decision Agent
+  description: >-
+    Advisory, read-only SAP agent that detects supplier silence on critical-path
+    purchase orders, quantifies the downstream consequence, and recommends an
+    action for the Purchasing HoD. Captures outcomes as institutional memory.
+  version: 1.0.0
+  labels:
+    domain: sourcing-procurement
+    advisory-only: "true"
+spec:
+  runtime: python
+  buildPath: .
+  entrypoint: python -m app
+  health:
+    type: http
+    endpoint: /.well-known/agent.json
+  model:
+    provider: aicore
+    name: sap/anthropic--claude-4-5-sonnet
+    fallback: sap/anthropic--claude-3-5-haiku
+    temperature: 0.0
+  # MCP server dependencies (Agent Gateway / ORD). In mock mode these are served by
+  # mcp-mock.json; in production they resolve via Agent Gateway against a BTP
+  # Destination to the customer's S/4HANA Private Cloud. All reads are advisory.
+  requires:
+    - name: s4-sourcing-procurement
+      kind: mcp-server
+      ordId: sap.s4:apiResource:PROCUREMENT_BOTTLENECK_SRV:v1
+      access: read-only
+      apis:
+        - PurchasingInfoRecordSaps4comapiResourcePurchasingInfoRecordv1
+        - PurchasingSourceListSaps4comapiResourcePurchasingSourceListv1
+        - ProcurementContractSapbdcngcapiResourceAribaContractWorkspacev1
+        - PurchasingOrganizationSaps4comapiResourcePurchasingOrganizationv1
+    - name: hana-vector-engine
+      kind: vector-store
+      ordId: sap.hana:vectorEngine:ZAGENT_PROCUREMENT:v1
+      access: read-write   # agent's own institutional memory only — never SAP business objects
+  observability:
+    tracing: step-level
+    logs: structured-json

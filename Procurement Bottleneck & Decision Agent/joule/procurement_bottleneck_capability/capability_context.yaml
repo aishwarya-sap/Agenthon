@@ -1,0 +1,8 @@
+# Declares the variables the scenario persists across conversation turns.
+# REQUIRED whenever scenarios reference $capability_context — without this file
+# the compiler fails: "contextId / taskId must be declared within
+# capability_context.yaml as variable name". These carry the A2A contextId + taskId
+# so a follow-up (e.g. the HITL "approve" turn) resumes the same agent task.
+variables:
+  - name: contextId
+  - name: taskId

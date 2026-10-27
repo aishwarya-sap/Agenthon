@@ -1,0 +1,20 @@
+# Solution descriptor — groups the agent asset(s) for SAP solution tooling.
+# The cf-deploy / deploy-plan skills discover the agent from THIS file, so it is
+# what makes the assets/<agent>/ layout a deployable solution (not just a folder).
+# Grounded in: Common Repo/CLAUDE.md §5 (solution + assets layout).
+apiVersion: com.sap.ai/v1
+kind: solution
+metadata:
+  name: agent-starter-kit                     # TODO: rename (kebab-case)
+  title: "[TODO: Agent display name]"
+  description: >-
+    [TODO: 2–3 sentences — what the agent does, which SAP systems it reads,
+    what question it answers for which role. Advisory/read-only by default.]
+  version: 1.0.0
+spec:
+  assets:
+    - name: agent-starter-kit                 # TODO: rename — MUST match the assets/<folder> name
+      kind: agent
+      path: assets/agent-starter-kit          # TODO: update path after rename
+    # A second asset (e.g. a chat UI) is added here as another list item — this is
+    # why the repo uses assets/ instead of a flat agent/ folder (Joule-2.0-ready).

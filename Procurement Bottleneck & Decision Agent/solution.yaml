@@ -1,0 +1,18 @@
+# Solution descriptor — Critical-Path Procurement Consequence Agent
+# Groups the agent asset for the SAP solution tooling (and the cf-deploy / deploy
+# skills, which discover the agent from this file).
+apiVersion: com.sap.ai/v1
+kind: solution
+metadata:
+  name: procurement-bottleneck-decision-agent
+  title: Procurement Bottleneck & Decision Agent
+  description: >-
+    Advisory procurement intelligence for Adarsh Developers — supplier-silence
+    detection, consequence simulation, and HoD decision support across active
+    projects. Built to the SAP Agent Golden Path (advisory, read-only).
+  version: 1.0.0
+spec:
+  assets:
+    - name: procurement-bottleneck-agent
+      kind: agent
+      path: assets/procurement-bottleneck-agent

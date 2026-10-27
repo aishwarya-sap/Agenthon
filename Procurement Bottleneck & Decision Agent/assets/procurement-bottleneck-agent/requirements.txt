@@ -1,0 +1,36 @@
+# Runtime dependencies — Critical-Path Procurement Consequence Agent
+# NOTE: sap_cloud_sdk (agent decorators, Agent Gateway client, XSUAA validation) is
+# provided by the SAP Joule/BTP runtime and is intentionally NOT pinned here. The
+# code degrades gracefully to offline mock mode when it is absent.
+
+# A2A server surface
+starlette>=0.37
+uvicorn>=0.30
+httpx>=0.27
+python-dotenv>=1.0
+pydantic>=2.7
+pydantic-settings>=2.4
+
+# Inbound IAS token validation (Joule A2A) — JWKS/RS256
+PyJWT[crypto]>=2.8
+
+# LLM access via SAP AI Core (LiteLLM) + orchestration.
+# PINNED to the exact versions proven to resolve the `sap/...` AI Core provider on
+# CF (same set as the production Material Risk agent). Loose ranges pulled litellm
+# 1.10x which broke `sap/` model resolution and silently fell back to a canned reply.
+litellm==1.94.1
+langchain==1.3.10
+langchain-core==1.6.1
+langchain-litellm==0.7.1
+langgraph==1.2.6
+
+# Project-data Excel adapter (Phase 1)
+openpyxl>=3.1
+
+# Attachment reading — digital-PDF invoice text extraction (pure-Python, CF-safe).
+# Scanned-image OCR is delegated to Joule document grounding, not bundled here.
+pypdf>=4.2
+
+# Observability
+opentelemetry-api>=1.25
+opentelemetry-sdk>=1.25

@@ -1,0 +1,35 @@
+---
+applications:
+  - name: procurement-bottleneck-agent
+    memory: 512M
+    disk_quota: 1G
+    instances: 1
+    buildpacks:
+      - python_buildpack
+    command: python -m app
+    health-check-type: http
+    health-check-http-endpoint: /.well-known/agent.json
+    timeout: 180
+    env:
+      # Model (AI Core via LiteLLM). Secrets are NOT set here — they are injected
+      # from bound service credentials (VCAP_SERVICES) or `cf set-env` at deploy.
+      AGENT_MODEL: sap/anthropic--claude-4.5-sonnet
+      AGENT_MODEL_FALLBACK: sap/anthropic--claude-4.5-haiku
+      AICORE_RESOURCE_GROUP: default
+      # Connectivity. BAI test phase = accelerator_hub (sandbox S/4 OData via APIKey;
+      # the S4_API_KEY secret is injected separately with `cf set-env`, never here).
+      # The client landscape overrides this with its own mode (gateway | onprem).
+      SAP_MODE: accelerator_hub
+      # Project-data source: SAP_PS (Phase 2) or EXCEL (Phase 1 upload).
+      PROJECT_DATA_SOURCE: SAP_PS
+      # Agent card URL — MUST match the CF landscape. us10-001 = internal BAI dev account.
+      # Change to the client region (e.g. jp10 / ap21) when deploying to their subaccount.
+      AGENT_PUBLIC_URL: https://procurement-bottleneck-agent.cfapps.us10-001.hana.ondemand.com
+    # services: — bound in Phase B/C. BAI data-phase supplies AI Core creds via
+    # `cf set-env` (AICORE_*), so no service instances are required to push.
+    #   - procurement-agent-aicore      # cf create-service aicore ... (SAP AI Core)
+    #   - procurement-agent-xsuaa       # cf create-service xsuaa application ... -c xs-security.json
+    #   - procurement-agent-destination # Phase C: Destination service
+    #   - procurement-agent-connectivity# Phase C: on-prem via Cloud Connector
+    #   - procurement-agent-hana        # durable institutional memory + RAG
+    #   - procurement-agent-logs        # log aggregation

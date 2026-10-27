@@ -1,0 +1,21 @@
+# Joule pro-code capability for the Procurement Bottleneck & Decision Agent.
+# Deployed to Joule via the Joule CLI (NOT clicked into a UI). Joule routes a user
+# question to the scenario whose description matches, runs the function, which calls
+# our remote CF agent over A2A through the PROCUREMENT_AGENT destination.
+schema_version: 3.28.0            # 3.28.0 = minimum for the agent-request (A2A BYOA) action
+
+metadata:
+  namespace: joule.ext           # MUST be joule.ext, or deploy fails (Tenant Admin error 5013/5014)
+  name: procurement_bottleneck_capability
+  version: 1.0.0
+  display_name: Procurement Bottleneck & Decision
+  description: >-
+    Detects supplier silence on critical-path purchase orders across active
+    projects, quantifies the downstream consequence (schedule slip, idle-resource
+    cost, milestone-penalty exposure, emergency-sourcing premium), and recommends
+    an action (escalate / source-switch / absorb) for the Purchasing Head of
+    Department. Advisory and read-only.
+
+system_aliases:
+  PROCUREMENT_AGENT:
+    destination: PROCUREMENT_AGENT   # BTP destination (OAuth2JWTBearer) pointing at the CF agent URL

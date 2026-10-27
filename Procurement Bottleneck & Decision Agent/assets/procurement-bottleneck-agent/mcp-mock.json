@@ -1,0 +1,159 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "mock_mode": true,
+    "deterministic": true,
+    "description": "Deterministic offline fixtures for the Critical-Path Procurement Consequence Agent. Activated by IBD_TESTING=1. Seed scenario: supplier LIFNR-0010045 silent for 11 days on structural-steel PO 4500000123, on the critical path of project P-INFRA-07 (Level-3 slab pour)."
+  },
+  "servers": {
+    "s4-sourcing-procurement": {
+      "mcp_server_name": "sap.s4:apiResource:PROCUREMENT_BOTTLENECK_SRV:v1",
+      "description": "S/4HANA Sourcing & Procurement reads (EKKO/EKPO/EKBE/EBAN/PRPS/AFKO/AFVV/MLST/KONP/EORD/LFM1) plus Ariba contract and HANA Vector Engine retrieval.",
+      "tools": {
+        "get_open_pr_po_chain": {
+          "description": "Retrieve the full PR->PO->confirmation chain for a material/project/supplier: PR approval status, PO issuance date, delivery due date, last confirmation; builds the end-to-end delay narrative. Reads Info Record lead-time (PLIFZ).",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "po_number": {"type": "string", "description": "PO number (EKKO.EBELN)"},
+              "project_code": {"type": "string"},
+              "supplier_lifnr": {"type": "string"},
+              "top": {"type": "integer", "description": "Max rows (max 100)"}
+            }
+          },
+          "mock_response": {
+            "signal_status": "live",
+            "value": [
+              {
+                "po_number": "4500000123", "po_item": "00010", "supplier_lifnr": "LIFNR-0010045",
+                "material_number": "MAT-STRUCT-STEEL-01", "material_category": "STEEL",
+                "pr_number": "10045567", "pr_release_status": "RELEASED", "pr_created": "2026-09-01",
+                "po_issued_date": "2026-09-10", "delivery_due_date": "2026-10-24",
+                "po_net_value_eur": 180000.0, "expected_lead_time_days_plifz": 21,
+                "last_confirmation_event": null, "delivery_complete_flag_elikz": "",
+                "deletion_flag_loekz": ""
+              }
+            ]
+          }
+        },
+        "get_approval_workflow_status": {
+          "description": "Check SAP workflow release status for open PRs/POs: approver identity, time-in-step; maps FRGKZ release indicator to approver roles.",
+          "input_schema": {
+            "type": "object",
+            "properties": {"document_number": {"type": "string"}, "top": {"type": "integer"}}
+          },
+          "mock_response": {
+            "signal_status": "live",
+            "value": [
+              {"document_number": "4500000123", "release_indicator_frgkz": "X",
+               "release_status": "FULLY_RELEASED", "approver_role": "Purchaser - Central Procurement",
+               "time_in_step_hours": 0, "bottleneck": false}
+            ]
+          }
+        },
+        "detect_supplier_silence": {
+          "description": "Derive supplier silence duration from the last order-acknowledgement event (EKBE VGABE=1) per PO plus external email timestamps; composite silence score. Supplements with Info Record expected-ack window (PLIFZ).",
+          "input_schema": {
+            "type": "object",
+            "properties": {"po_number": {"type": "string"}, "supplier_lifnr": {"type": "string"}, "top": {"type": "integer"}}
+          },
+          "mock_response": {
+            "signal_status": "live",
+            "value": [
+              {"po_number": "4500000123", "supplier_lifnr": "LIFNR-0010045",
+               "last_order_ack_vgabe1": null, "days_since_po_issue": 33,
+               "silence_duration_days": 11, "email_last_contact": "2026-09-29",
+               "composite_silence_score": 0.88, "expected_ack_window_days": 3}
+            ]
+          }
+        },
+        "get_source_and_contract_dependencies": {
+          "description": "Approved source-of-supply entries from the Source List (EORD) + Info Record, plus Ariba contract terms. Returns alternative approved vendors with validity and fixed-source flag.",
+          "input_schema": {
+            "type": "object",
+            "properties": {"material_number": {"type": "string"}, "plant": {"type": "string"}, "top": {"type": "integer"}}
+          },
+          "mock_response": {
+            "signal_status": "live",
+            "value": [
+              {"material_number": "MAT-STRUCT-STEEL-01", "plant": "1710",
+               "current_supplier_lifnr": "LIFNR-0010045", "fixed_source": false,
+               "alternatives": [
+                 {"supplier_lifnr": "LIFNR-0010099", "valid_from": "2026-01-01", "valid_to": "2027-12-31",
+                  "contracted": true, "has_pinfo_record": true, "on_time_rate": 0.94,
+                  "lead_time_days": 18, "purchasing_blocked": false, "remaining_contract_capacity_to": 300}
+               ]}
+            ]
+          }
+        },
+        "get_procurement_contract_terms": {
+          "description": "Penalty clause amounts, liquidated-damages schedules, and force-majeure terms from the Ariba Contract Workspace (KONP.KBETR -> milestone at risk).",
+          "input_schema": {
+            "type": "object",
+            "properties": {"supplier_lifnr": {"type": "string"}, "material_number": {"type": "string"}, "top": {"type": "integer"}}
+          },
+          "mock_response": {
+            "signal_status": "live",
+            "value": [
+              {"supplier_lifnr": "LIFNR-0010045", "contract_source": "ariba",
+               "contract_ref": "CW-2026-0453", "penalty_clause_eur": 40000.0,
+               "liquidated_damages_per_day_eur": 5000.0, "force_majeure": true}
+            ]
+          }
+        },
+        "link_po_to_project_wbs": {
+          "description": "Join open PO items (EKPO account assignment) -> PRPS -> AFKO/AFVV/MLST to find dependent deliverables; returns network float and milestone dependencies.",
+          "input_schema": {
+            "type": "object",
+            "properties": {"po_number": {"type": "string"}, "top": {"type": "integer"}}
+          },
+          "mock_response": {
+            "signal_status": "live",
+            "value": [
+              {"po_number": "4500000123", "project_code": "P-INFRA-07", "wbs_element": "P-INFRA-07.1.3",
+               "activity_id": "0040", "activity_text": "Level-3 slab pour",
+               "available_float_days": 0, "critical_path": true,
+               "required_date": "2026-10-24", "milestone_id": "MS-L3-SLAB",
+               "milestone_payment_eur": 250000.0, "resource_teams": 2,
+               "daily_team_cost_rate_eur": 8500.0, "responsible_person": "PM-ANDERSON"}
+            ]
+          }
+        },
+        "get_vendor_delivery_performance": {
+          "description": "Vendor delivery metrics from EKBE/EKPO/LFM1 (late-delivery frequency, EINDT vs BUDAT delta, payment-term variance) -> supplier_delivery_risk_score 0-100. Optional external risk-feed enrichment (labelled simulated).",
+          "input_schema": {
+            "type": "object",
+            "properties": {"supplier_lifnr": {"type": "string"}, "material_category": {"type": "string"}, "top": {"type": "integer"}}
+          },
+          "mock_response": {
+            "signal_status": "live",
+            "value": [
+              {"supplier_lifnr": "LIFNR-0010045", "material_category": "STEEL",
+               "deliveries_last_12m": 8, "late_deliveries": 5, "avg_days_late": 9.5,
+               "on_time_rate": 0.375, "supplier_delivery_risk_score": 78,
+               "purchasing_block_sperm": "", "external_risk_feed": {"signal_status": "simulated", "distress_flag": false}}
+            ]
+          }
+        },
+        "rag_retrieve_contract_and_history": {
+          "description": "Semantic + metadata-filtered retrieval over the HANA Cloud Vector Engine (penalty clauses, prior escalations, alt-source justifications), filtered by contract id / LIFNR / MATNR / WERKS. Returns chunks with similarity scores; caller applies the >=0.82 gate.",
+          "input_schema": {
+            "type": "object",
+            "properties": {"query": {"type": "string"}, "supplier_lifnr": {"type": "string"}, "material_number": {"type": "string"}, "top": {"type": "integer"}}
+          },
+          "mock_response": {
+            "signal_status": "live",
+            "value": [
+              {"chunk_id": "CW-2026-0453#penalty", "similarity": 0.91, "source": "Ariba Contract CW-2026-0453",
+               "text": "Liquidated damages of EUR 5,000 per calendar day of late delivery apply to critical-path structural steel, capped at EUR 40,000 per milestone."},
+              {"chunk_id": "ESC-2026-02#steel", "similarity": 0.86, "source": "Prior escalation ESC-2026-02",
+               "text": "Supplier LIFNR-0010045 went silent on structural steel in Feb 2026; resolved only after manual escalation at day 14. Alternative LIFNR-0010099 delivered within 18 days."},
+              {"chunk_id": "note#low", "similarity": 0.74, "source": "Vendor scorecard",
+               "text": "General payment-term variance note (below similarity gate — excluded)."}
+            ]
+          }
+        }
+      }
+    }
+  }
+}

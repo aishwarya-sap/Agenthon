@@ -1,0 +1,9 @@
+# Digital-assistant deployment descriptor — entry point for `joule compile` / `joule deploy`.
+# schema 1.4.0 pairs with capability schema 3.28.0. Do NOT add
+# enable_native_agenticness / conversational_search (those need 1.5.0-beta).
+schema_version: 1.4.0
+name: agent_starter_kit_capability          # TODO: rename — must match capability metadata.name
+capabilities:
+  - type: local
+    name: agent_starter_kit_capability      # TODO: rename (same as above)
+    folder: ./agent-starter-kit-capability   # TODO: rename folder to match your agent

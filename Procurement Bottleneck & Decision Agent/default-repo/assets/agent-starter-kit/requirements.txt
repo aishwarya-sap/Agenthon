@@ -1,0 +1,27 @@
+# Core runtime — a2a-sdk brings Starlette; DO NOT add a bare starlette pin (version conflict)
+a2a-sdk>=0.2.7
+
+# LangGraph orchestration + LLM
+# NOTE: Do NOT add generative-ai-hub-sdk here — it pins pydantic==2.10.6 which
+# conflicts with a2a-sdk>=0.2.7 (requires pydantic>=2.11.3). Use langchain-openai instead.
+langgraph>=0.2.0
+langchain-core>=0.3.0
+langchain-openai>=0.3.0
+
+# HTTP + server
+uvicorn[standard]==0.29.0
+httpx>=0.27.0
+python-dotenv==1.0.1
+
+# Auth
+pyjwt==2.8.0
+cryptography==42.0.7
+
+# Observability
+structlog==24.1.0            # structured JSON logs for CF / Kibana
+
+# CF environment helpers
+cfenv==0.5.3                 # parses VCAP_SERVICES / VCAP_APPLICATION from CF runtime
+
+# ── Sprint 2+: uncomment for BTP Destination / Connectivity service ────────────
+# requests>=2.31.0

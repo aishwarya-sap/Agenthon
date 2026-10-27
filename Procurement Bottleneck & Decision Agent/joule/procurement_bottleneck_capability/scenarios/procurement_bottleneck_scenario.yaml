@@ -1,0 +1,28 @@
+# Scenario = the routing shell. Joule matches this description to the user's intent,
+# then runs the target function, passing the persisted contextId/taskId in (for follow-ups)
+# and storing the function's returned contextId/taskId back into capability_context.
+# Keep the description rich and specific so routing is accurate.
+description: >-
+  Use when the user asks about stuck, delayed, or unconfirmed purchase orders;
+  supplier silence or non-acknowledgement on critical-path materials; the schedule
+  or cost impact of a late or non-responsive supplier on a project; whether to
+  escalate, switch source, or absorb a procurement delay; or for a consequence
+  scorecard on a project's at-risk purchase orders. Examples:
+  "Run the procurement bottleneck analysis for project P-INFRA-07",
+  "Which open POs have suppliers silent on critical-path materials?",
+  "What is the cost of inaction if PO 4500000123 is not confirmed in 48 hours?".
+
+target:
+  type: function
+  name: procurement_bottleneck_function
+  parameters:
+    - name: contextId
+      value: $capability_context.contextId
+    - name: taskId
+      value: $capability_context.taskId
+
+capability_context:
+  - name: contextId
+    value: $target_result.contextId
+  - name: taskId
+    value: $target_result.taskId

@@ -1,0 +1,31 @@
+apiVersion: asset.sap/v1
+kind: Asset
+metadata:
+  name: agent-starter-kit                          # TODO: rename to your agent (kebab-case)
+  namespace: sap.btp.agent
+spec:
+  displayName: "Agent Starter Kit"                 # TODO: rename
+  description: "[TODO: one-sentence description of what this agent does]"
+  version: "1.0.0"
+  category: ai-agent
+  provider: BAI
+  runtime:
+    type: CloudFoundry
+    region: "[TODO: e.g. ap20, us10-001]"          # Target CF region
+    org: "[TODO: CF org name]"
+    space: "[TODO: CF space name]"
+  endpoints:
+    a2a:
+      url: "[TODO: https://<agent-name>.cfapps.<region>.hana.ondemand.com]"
+      protocol: A2A
+      version: "0.3.0"
+    agentCard:
+      url: "[TODO: https://<agent-name>.cfapps.<region>.hana.ondemand.com/.well-known/agent.json]"
+      protocol: HTTP
+    health:
+      url: "[TODO: https://<agent-name>.cfapps.<region>.hana.ondemand.com/health]"
+      protocol: HTTP
+  tags:
+    - joule-byoa
+    - a2a
+    - "[TODO: domain tag, e.g. procurement / finance / hr]"

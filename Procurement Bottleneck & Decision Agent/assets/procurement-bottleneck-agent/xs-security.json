@@ -1,0 +1,28 @@
+{
+  "xsappname": "procurement-bottleneck-agent",
+  "tenant-mode": "dedicated",
+  "description": "XSUAA security descriptor for the Critical-Path Procurement Consequence Agent (advisory, read-only).",
+  "scopes": [
+    { "name": "$XSAPPNAME.Invoke", "description": "Invoke the procurement consequence agent" }
+  ],
+  "role-templates": [
+    {
+      "name": "ProcurementAgentUser",
+      "description": "Purchasing HoD / Purchaser - Central Procurement — may invoke the agent and approve advisory actions",
+      "scope-references": ["$XSAPPNAME.Invoke"]
+    }
+  ],
+  "role-collections": [
+    {
+      "name": "ProcurementConsequenceAgentUser",
+      "description": "Assign to Purchasing HoD users who review consequence scorecards and approve escalations",
+      "role-template-references": ["$XSAPPNAME.ProcurementAgentUser"]
+    }
+  ],
+  "oauth2-configuration": {
+    "token-validity": 3600,
+    "redirect-uris": [
+      "https://procurement-bottleneck-agent.cfapps.ap20.hana.ondemand.com/**"
+    ]
+  }
+}
