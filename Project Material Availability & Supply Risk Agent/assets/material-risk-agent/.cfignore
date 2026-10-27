@@ -1,0 +1,14 @@
+.venv/
+venv/
+**/__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.coverage
+coverage.json
+coverage.xml
+test_report.json
+.git/
+.DS_Store
+tests/
+prebuilt_tests/
