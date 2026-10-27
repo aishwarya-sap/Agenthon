@@ -1,189 +1,149 @@
-"""LangGraph ReAct agent — the core intelligence layer.
+"""Generic SAP A2A agent — Sprint 1 scaffold.
 
-Uses langchain-openai ChatOpenAI pointed at SAP AI Core's OpenAI-compatible endpoint.
-DO NOT switch to generative-ai-hub-sdk: it pins pydantic==2.10.6 which conflicts
-with a2a-sdk>=0.2.7 (requires pydantic>=2.11.3).
+This is the default repo shared with every client at engagement start.
+Replace [Agent Name] and the system prompt with your domain specifics in Sprint 2.
 """
-from __future__ import annotations
-
-import json
 import os
-from typing import Any, AsyncIterable, Literal
 
-from langchain_core.messages import AIMessage, ToolMessage
-from langchain_core.runnables import RunnableConfig
-from langgraph.checkpoint.memory import MemorySaver
-from langgraph.prebuilt import create_react_agent
-from pydantic import BaseModel
+try:
+    from sap_cloud_sdk.agent_decorators import agent_config, agent_model, prompt_section
+except Exception:
+    def _noop_decorator(*_a, **_k):
+        def _wrap(fn):
+            return fn
+        return _wrap
+    agent_model = agent_config = prompt_section = _noop_decorator
 
-from app.config import is_mock_mode
-from app.tools import get_tools
+from langchain.agents import create_agent
+from langchain_core.messages import HumanMessage
+from langchain_core.tools import BaseTool
+from langchain_litellm import ChatLiteLLM
+from typing import AsyncGenerator, Literal, Sequence
+from dataclasses import dataclass
 
 
-class ResponseFormat(BaseModel):
-    """Structured output schema — maps directly to A2A TaskState."""
-    status: Literal["input_required", "completed", "error"] = "input_required"
+# ---------------------------------------------------------------------------
+# Exactly 3 decorators — cookbook mandate.
+# @agent_model  : which model to use
+# @agent_config : temperature only (the one allowed @agent_config parameter)
+# @prompt_section : the full system prompt
+# ---------------------------------------------------------------------------
+
+@agent_model(
+    key="config.model",
+    label="LLM Model",
+    description="The language model powering this agent",
+)
+def get_model_name() -> str:
+    return os.environ.get("AGENT_MODEL", "sap/anthropic--claude-4.5-sonnet")
+
+
+@agent_config(
+    key="config.temperature",
+    label="LLM Temperature",
+    description="Controls response randomness (0.0 = deterministic, 1.0 = creative)",
+)
+def get_temperature() -> float:
+    return 0.0
+
+
+@prompt_section(
+    key="prompts.system",
+    label="System Prompt",
+    description="The agent's role, rules, and output format",
+)
+def get_system_prompt() -> str:
+    return """You are the [Agent Name] agent, an AI assistant built on SAP BTP.
+
+## MANDATORY RULES
+1. Never fabricate SAP document numbers, amounts, or statuses — retrieve live data first.
+2. Set top=100 on every tool call that accepts it (prevents context overflow on large datasets).
+3. Present both benefits AND costs before stating a net figure — never partial analysis.
+4. Never execute write or delete operations on SAP systems — advisory only.
+5. When data is missing, state this explicitly; continue with partial simulation + disclaimer.
+6. End every financial output with: "These are estimates based on available SAP data. Validate with your finance team before acting."
+
+## Role
+[Replace this with your domain-specific agent role and workflow instructions.]
+
+Always call tools for data and numbers — never compute values yourself. If a tool returns an
+error, report it plainly without inventing a result."""
+
+
+@dataclass
+class AgentResponse:
+    status: Literal["input_required", "completed", "error"]
     message: str
 
 
-def get_llm():  # pragma: no cover
-    """Build ChatOpenAI from AI Core service binding.
+class SampleAgent:
+    SUPPORTED_CONTENT_TYPES = ["text", "text/plain"]
 
-    Reads AICORE_SERVICE_KEY (local dev) or VCAP_SERVICES.aicore[0] (CF).
-    Fetches an OAuth2 client-credentials token, then points ChatOpenAI at
-    AI Core's /v2/inference/deployments OpenAI-compatible endpoint.
-    """
-    import httpx
-    from langchain_openai import ChatOpenAI
+    def __init__(self):
+        self.llm = ChatLiteLLM(
+            model=get_model_name(),
+            temperature=get_temperature(),
+        )
+        self._system_prompt = get_system_prompt()
 
-    aicore_key = os.getenv("AICORE_SERVICE_KEY")
-    if aicore_key:
-        creds = json.loads(aicore_key)
-    else:
-        vcap = json.loads(os.getenv("VCAP_SERVICES", "{}"))
-        bindings = vcap.get("aicore", [])
-        if not bindings:
-            raise RuntimeError(
-                "No AI Core service binding. "
-                "Set AICORE_SERVICE_KEY for local dev or bind an aicore service in CF."
+    async def stream(
+        self,
+        query: str,
+        context_id: str,
+        tools: Sequence[BaseTool] | None = None,
+    ) -> AsyncGenerator[dict, None]:
+        yield {
+            "is_task_complete": False,
+            "require_user_input": False,
+            "content": "Thinking...",
+        }
+        try:
+            from langgraph.checkpoint.memory import MemorySaver
+            checkpointer = MemorySaver()
+            graph = create_agent(
+                self.llm,
+                tools=list(tools or []),
+                system_prompt=self._system_prompt,
+                checkpointer=checkpointer,
             )
-        creds = bindings[0]["credentials"]
-
-    token_resp = httpx.post(
-        creds["url"] + "/oauth/token",
-        data={"grant_type": "client_credentials"},
-        auth=(creds["clientid"], creds["clientsecret"]),
-        timeout=30,
-    )
-    token_resp.raise_for_status()
-    access_token = token_resp.json()["access_token"]
-
-    api_url = creds["serviceurls"]["AI_API_URL"]
-    model_name = os.getenv("AGENT_MODEL", "sap/anthropic--claude-4-5-sonnet")
-    resource_group = os.getenv("AICORE_RESOURCE_GROUP", "default")
-
-    return ChatOpenAI(
-        model=model_name,
-        base_url=f"{api_url}/v2/inference/deployments",
-        api_key=access_token,
-        max_tokens=4096,
-        default_headers={"AI-Resource-Group": resource_group},
-    )
-
-
-SYSTEM_INSTRUCTION = """You are a [DOMAIN] assistant built on SAP BTP, powered by SAP AI Core.
-You help [USER_ROLE] with [PRIMARY_TASK] by reading live data from SAP systems.
-
-MANDATORY RULES:
-1. [TODO: fill in domain-specific rule 1 — e.g. "Only answer about procurement data for the authenticated user's company code"]
-2. [TODO: fill in domain-specific rule 2 — e.g. "When a purchase order is mentioned, always include its status and last change date"]
-3. [TODO: fill in domain-specific rule 3]
-4. Never execute write, update, or delete operations on SAP systems — advisory and read-only only.
-5. When data is missing or unavailable, state that explicitly and label any estimates as estimates.
-6. End every quantitative output with: "These are estimates based on available SAP data. Verify before making financial decisions."
-
-When you complete the request, set status to "completed".
-When you need more information from the user, set status to "input_required" and ask your question.
-If an error occurs, set status to "error" and explain what went wrong.
-"""
-
-RESPONSE_FORMAT_INSTRUCTION = """Always respond using the ResponseFormat schema.
-Set 'status' to indicate the task state and 'message' for your response text."""
-
-_memory = MemorySaver()
-
-
-class StarterKitAgent:
-    """LangGraph ReAct agent with A2A-compatible response format.
-
-    In mock mode (IBD_TESTING=1) the LLM and graph are never instantiated,
-    so tests run fully offline without any credentials.
-    """
-
-    SUPPORTED_CONTENT_TYPES = ["text/plain"]
-
-    def __init__(self) -> None:
-        self._mock = is_mock_mode()
-        if not self._mock:  # pragma: no cover
-            model = get_llm()
-            self.graph = create_react_agent(
-                model,
-                tools=get_tools(),
-                checkpointer=_memory,
-                prompt=SYSTEM_INSTRUCTION,
-                response_format=(RESPONSE_FORMAT_INSTRUCTION, ResponseFormat),
+            config = {"configurable": {"thread_id": context_id}}
+            result = await graph.ainvoke(
+                {"messages": [HumanMessage(content=query)]}, config
             )
-
-    def invoke(self, query: str, session_id: str) -> dict[str, Any]:
-        if self._mock:
-            return {
-                "is_task_complete": True,
-                "require_user_input": False,
-                "content": f"[MOCK] Received: {query!r}. (IBD_TESTING=1 — no SAP calls)",
-            }
-        config: RunnableConfig = {"configurable": {"thread_id": session_id}}  # pragma: no cover
-        self.graph.invoke({"messages": [("user", query)]}, config)  # pragma: no cover
-        return self._get_response(config)  # pragma: no cover
-
-    async def stream(  # pragma: no cover
-        self, query: str, session_id: str
-    ) -> AsyncIterable[dict[str, Any]]:
-        if self._mock:
+            messages = result.get("messages", []) if isinstance(result, dict) else []
+            content = ""
+            for msg in reversed(messages):
+                text = getattr(msg, "content", "") or ""
+                if isinstance(text, list):
+                    text = "".join(b.get("text", "") for b in text if isinstance(b, dict))
+                if text.strip():
+                    content = text
+                    break
             yield {
                 "is_task_complete": True,
                 "require_user_input": False,
-                "content": f"[MOCK] Received: {query!r}. (IBD_TESTING=1 — no SAP calls)",
+                "content": content or "No response.",
             }
-            return
-        config: RunnableConfig = {"configurable": {"thread_id": session_id}}
-        inputs = {"messages": [("user", query)]}
-
-        for item in self.graph.stream(inputs, config, stream_mode="values"):
-            message = item["messages"][-1]
-            if isinstance(message, AIMessage) and message.tool_calls:
-                yield {
-                    "is_task_complete": False,
-                    "require_user_input": False,
-                    "content": "Processing your request...",
-                }
-            elif isinstance(message, ToolMessage):
-                yield {
-                    "is_task_complete": False,
-                    "require_user_input": False,
-                    "content": "Analyzing results...",
-                }
-
-        yield self._get_response(config)
-
-    def _get_response(self, config: RunnableConfig) -> dict[str, Any]:  # pragma: no cover
-        state = self.graph.get_state(config)
-        structured = state.values.get("structured_response")
-
-        if structured and isinstance(structured, ResponseFormat):
-            if structured.status in ("input_required", "error"):
-                return {
-                    "is_task_complete": False,
-                    "require_user_input": True,
-                    "content": structured.message,
-                }
-            return {
+        except Exception:
+            import logging
+            logging.getLogger(__name__).exception("Agent error")
+            yield {
                 "is_task_complete": True,
                 "require_user_input": False,
-                "content": structured.message,
+                "content": "An error occurred. Please try again.",
             }
 
-        messages = state.values.get("messages", [])
-        if messages:
-            last = messages[-1]
-            if hasattr(last, "content"):
-                return {
-                    "is_task_complete": True,
-                    "require_user_input": False,
-                    "content": str(last.content),
-                }
-
-        return {
-            "is_task_complete": False,
-            "require_user_input": True,
-            "content": "I couldn't process your request. Could you rephrase?",
-        }
+    async def invoke(
+        self,
+        query: str,
+        context_id: str,
+        tools: Sequence[BaseTool] | None = None,
+    ) -> AgentResponse:
+        last: dict = {}
+        async for chunk in self.stream(query, context_id, tools=tools):
+            last = chunk
+        if last.get("is_task_complete"):
+            return AgentResponse(status="completed", message=last["content"])
+        if last.get("require_user_input"):
+            return AgentResponse(status="input_required", message=last["content"])
+        return AgentResponse(status="error", message=last.get("content", "Unknown error"))

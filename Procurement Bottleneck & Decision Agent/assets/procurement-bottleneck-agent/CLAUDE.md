@@ -26,5 +26,6 @@ gunicorn app.main:app -c gunicorn.conf.py   # production entry (CF Procfile)
 ```
 
 ## Governance
-Tracked against `docs/checklists/{quality-gate,code-review}-checklist.md`; reports in
-`docs/quality-gate-report.md` + `docs/code-review-report.md`. Decisions in `docs/decisions/`.
+Tracked against the GDH APAC Agent Checklist v5 (10-pillar / 60-item):
+`docs/checklists/agent-checklist-L0-L10.md`; per-pillar status in `docs/agent-checklist-assessment.md`.
+Pillar numbering mirrors the `governance/*.md` artifacts. Decisions in `docs/decisions/`.

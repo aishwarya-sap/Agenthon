@@ -9,7 +9,7 @@ Advisory, read-only SAP A2A agent on BTP Cloud Foundry. Hand-built to the GDH AI
 See `docs/CHANGELOG.md`.
 
 ### Approval
-Production readiness tracked in `docs/quality-gate-report.md` and `docs/code-review-report.md`.
+Production readiness tracked in `docs/agent-checklist-assessment.md` against the v5 Agent Checklist (`docs/checklists/agent-checklist-L0-L10.md`).
 
 ## Architecture
 

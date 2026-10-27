@@ -13,7 +13,7 @@
 - `docs/specs/design-brief.md` — confirmed design decisions (D0–D12)
 - `docs/specs/technical-specification.md` — as-built technical design
 - `docs/specs/rtm.md` — requirements traceability
-- `docs/quality-gate-report.md`, `docs/code-review-report.md` — QG/CR results
+- `docs/checklists/agent-checklist-L0-L10.md`, `docs/agent-checklist-assessment.md` — v5 checklist + per-pillar status
 
 ### 1.3 Acronyms and Glossary
 

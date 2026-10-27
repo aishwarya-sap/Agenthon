@@ -33,5 +33,9 @@ All notable changes to the Procurement Bottleneck & Decision Agent. Format follo
 - Intent short-circuit swallowing valid questions (`wants_freeform` regex too narrow).
 
 ### Governance
-- Replaced the non-standard "L0–L10 pillar" checklist with the authoritative Quality Gate (`QG-*`)
-  and Code Review (`CR-*`) checklists.
+- Adopted the authoritative **GDH APAC Agent Checklist v5** (10-pillar / 60-item, L0-1 … L0-10) as
+  the single checklist: `docs/checklists/agent-checklist-L0-L10.md`, with the per-pillar assessment in
+  `docs/agent-checklist-assessment.md`. (Supersedes an interim QG/CR framing; the pillar numbering
+  matches the `governance/*.md` artifacts.)
+- Added a HANA Cloud persistence placeholder (`MEMORY_BACKEND=hana`) for the recommendation/approval
+  audit trail + Vector Engine recall — env/config seam only, default stays in-process.

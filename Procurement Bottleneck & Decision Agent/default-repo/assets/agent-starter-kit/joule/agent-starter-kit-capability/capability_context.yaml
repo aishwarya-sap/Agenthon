@@ -1,6 +1,0 @@
-# REQUIRED when scenarios reference $capability_context. Declares the variables
-# Joule persists across turns (A2A contextId + taskId) so follow-up turns resume
-# the same agent task. Without this file the compiler fails.
-variables:
-  - name: contextId
-  - name: taskId

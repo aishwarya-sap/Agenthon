@@ -128,6 +128,31 @@ def aicore_configured() -> bool:
     return bool(os.environ.get("AICORE_CLIENT_ID") and os.environ.get("AICORE_AUTH_URL"))
 
 
+# --- Decision/approval persistence (HANA Cloud) -----------------------------
+# The agent persists its recommendations + HoD approvals (DecisionRecord) to an
+# append-only audit store. Default is the in-process MemoryStore (mock-first MVP +
+# offline tests). Set MEMORY_BACKEND=hana to select the durable HANA Cloud backend
+# (ZAGENT_DECISION_LOG table, INSERT/SELECT-only role, + Vector Engine recall).
+HANA_DECISION_TABLE = os.environ.get("HANA_DECISION_TABLE", "ZAGENT_DECISION_LOG")
+HANA_VECTOR_TABLE = os.environ.get("HANA_VECTOR_TABLE", "ZAGENT_DECISION_VEC")
+HANA_SCHEMA = os.environ.get("HANA_SCHEMA", "")
+
+
+def memory_backend() -> str:
+    """Persistence backend for the decision log: 'in_memory' (default) or 'hana'."""
+    return os.environ.get("MEMORY_BACKEND", "in_memory").strip().lower()
+
+
+def hana_configured() -> bool:
+    """True when HANA Cloud connection placeholders are present (host + user).
+
+    Independent of MEMORY_BACKEND so deployment can verify bindings before flipping
+    the backend. On CF the credentials arrive via VCAP_SERVICES (bound HANA/HDI
+    service); locally they come from HANA_* env vars.
+    """
+    return bool(os.environ.get("HANA_HOST") and os.environ.get("HANA_USER"))
+
+
 def emergency_premium_pct(material_category: str | None) -> float:
     """Return the configured spot-market premium for a material category."""
     key = (material_category or "DEFAULT").upper()

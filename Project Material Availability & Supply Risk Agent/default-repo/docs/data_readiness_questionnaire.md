@@ -49,11 +49,30 @@ Confirm these items with the client before Sprint 2. Send the email template in 
 
 ---
 
-## 5. Stakeholders
+## 5. HANA Cloud — decision/approval persistence (Sprint 4)
+
+The agent persists its recommendations and approvals to an append-only backend table on
+HANA Cloud (the audit trail), and optionally uses the HANA Cloud Vector Engine for semantic
+recall of prior decisions. Confirm the following so this can be provisioned.
+
+| Question | Client Answer |
+|----------|--------------|
+| Is a HANA Cloud instance available (or should one be provisioned) in the BTP subaccount? | |
+| Can a schema be created for the agent (e.g. `ADARSH_AGENT`)? | |
+| Approval to create the audit table `ZAGENT_DECISION_LOG` (+ a vector table for recall)? | |
+| Can a technical user be created with an **INSERT/SELECT-only** role on that schema (no update/delete)? | |
+| Will credentials be shared via a HANA service key, or bound to CF as an HDI-container / schema service? | |
+| Is the HANA Cloud Vector Engine enabled (needed for semantic recall of past decisions)? | |
+| Any data-residency / retention requirements for the stored decisions? | |
+
+---
+
+## 6. Stakeholders
 
 | Role | Name | Contact |
 |------|------|---------|
 | Business sponsor | | |
 | Technical lead / BTP admin | | |
 | S/4HANA basis admin | | |
+| HANA Cloud / DB admin | | |
 | Functional consultant (data sign-off) | | |

@@ -14,6 +14,8 @@ import threading
 import uuid
 from datetime import datetime, timezone
 
+import config
+
 INTERVENTION_OUTCOME = "intervention_outcome"
 SUPPLIER_COMM_PREF = "supplier_comm_pref"
 ESCALATION_PATTERN = "escalation_pattern"
@@ -70,14 +72,39 @@ class MemoryStore:
             self._records.clear()
 
 
+class HanaMemoryStore(MemoryStore):
+    """PLACEHOLDER — durable HANA Cloud audit store for the decision/intervention log.
+
+    Persists each record to ``<HANA_SCHEMA>.<HANA_DECISION_TABLE>`` (append-only, backed
+    by an INSERT/SELECT-only role) and uses the HANA Cloud Vector Engine
+    (``HANA_VECTOR_TABLE``) for semantic recall — behind this exact ``MemoryStore``
+    interface, so business logic and tests do not change.
+
+    Not wired yet: requires the ``hdbcli`` driver and a provisioned/bound HANA Cloud
+    instance. Selected only when ``MEMORY_BACKEND=hana``. See the data-readiness
+    questionnaire (docs/) for what the client must provision.
+    """
+
+    def __init__(self) -> None:  # pragma: no cover - placeholder, not reachable in tests
+        raise NotImplementedError(
+            "HANA Cloud persistence is a placeholder. To enable MEMORY_BACKEND=hana: "
+            "provision HANA Cloud, create ZAGENT_DECISION_LOG (+ vector table) under a "
+            "schema with an INSERT/SELECT-only role, add the `hdbcli` dependency, and "
+            "implement record()/recall() against it. See docs/ (data-readiness §HANA Cloud)."
+        )
+
+
 _STORE: MemoryStore | None = None
 
 
 def get_memory_store() -> MemoryStore:
     global _STORE
     if _STORE is None:
-        _STORE = MemoryStore()
-        _seed(_STORE)
+        if config.memory_backend() == "hana":
+            _STORE = HanaMemoryStore()  # placeholder — raises until implemented
+        else:
+            _STORE = MemoryStore()
+            _seed(_STORE)
     return _STORE
 
 

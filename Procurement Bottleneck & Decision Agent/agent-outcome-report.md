@@ -1,12 +1,12 @@
 # Agent Outcome Report — Procurement Bottleneck & Decision Agent
-Generated: 2026-10-13 · Reframed to GDH AI Factory Quality-Gate / Code-Review standard: 2026-10-27
+Generated: 2026-10-13 · Scored against GDH APAC Agent Checklist v5 (10-pillar / 60-item): 2026-10-27
 Build scope: full custom agent (advisory, read-only)
 
-> **Governance note (2026-10-27):** this report was previously framed against a non-standard
-> "L0–L10 pillar" model. That model does not exist in the official SAP GDH AI Factory standards.
-> Production readiness is now tracked against the two authoritative checklists:
-> **Quality Gate** → `docs/checklists/quality-gate-checklist.md` (report: `docs/quality-gate-report.md`)
-> and **Code Review** → `docs/checklists/code-review-checklist.md` (report: `docs/code-review-report.md`).
+> **Governance note (2026-10-27):** production readiness is tracked against the authoritative
+> **GDH APAC Agent Checklist v5** — the 10-pillar (L0-1 … L0-10), 60-item model. Checklist:
+> `docs/checklists/agent-checklist-L0-L10.md`; per-pillar assessment for this agent:
+> `docs/agent-checklist-assessment.md`. The pillar numbering is also reflected in the agent's
+> `assets/procurement-bottleneck-agent/governance/` artifacts (e.g. `2.6`, `5.3`, `10.2`).
 
 ---
 
@@ -31,23 +31,19 @@ Build scope: full custom agent (advisory, read-only)
 | Demo UI (offline) | ✅ | `demo/index.html` — Daily Blockers dashboard + chat |
 | Tests | ✅ | **134 tests passing, coverage ≥ 70%** |
 | Deploy artifacts | ✅ | `manifest.yml`, `xs-security.json`, `.env.example` |
-| Checklists + reports | ✅ | `docs/checklists/` + `docs/quality-gate-report.md` + `docs/code-review-report.md` |
+| Checklists + assessment | ✅ | `docs/checklists/agent-checklist-L0-L10.md` (v5) + `docs/agent-checklist-assessment.md` |
 
-## 3. Governance status (Quality Gate + Code Review)
-Full detail in the two reports under `docs/`. Honest summary:
+## 3. Governance status (v5 Agent Checklist — 10 pillars)
+Full per-pillar detail in `docs/agent-checklist-assessment.md`. Honest summary:
 
-| Area | Status | Note |
+| Pillar | Status | Note |
 |---|---|---|
-| Test Execution (QG-TE) | ✅ PASS | 134 tests, conftest, unit + integration, coverage ≥ 70% |
-| Security (CR-SR) | ✅ Strong | No hardcoded secrets; `.env` gitignored; advisory read-only; injection scan. 1 Major: CORS wildcard to restrict for prod |
-| Performance (CR-PR) | ✅ Good | Server-side OData `$filter/$select/$top`; async I/O; bounded retries |
-| Static Analysis (QG-SA) | ⚠ Not enforced | ruff/mypy/bandit not yet wired in CI |
-| API Contract (QG-AC) / A2A (CR-A2) | ⚠ Divergent stack | Functional A2A (card, `message/send`, `/health`); not the a2a-sdk object model (ADR-0004) |
-| Dependency (QG-DA) | ⚠ Conditional | Pins + `requirements.txt` lock present; no `pyproject.toml` |
-| LLM Quality (QG-LQ) | ⚠ Partial | Low temp, grounding, input/output validation, no PII in prompts; uses ChatLiteLLM not `gen_ai_hub` |
+| L0-2 LLM Selection · L0-3 RAG · L0-4 Metering · L0-5 Responsible AI · L0-8 Perf · L0-10 Resilience | ✅ Covered | Backed by `governance/` artifacts (`2.6`, `2.7`, `3.3`, `4.5`, `4.6`, `5.2`, `5.3`, `5.5`, `5.7`, `8.4`, `10.2`, `10.3-10.5`). |
+| L0-6 Dev & Deployment Standards | ✅ Covered (CI partial) | Mock-first, 134 tests ≥ 70%, CF deploy artifacts. Gap: ruff/mypy/bandit not yet wired in CI. |
+| L0-1 Onboarding · L0-7 Release & Go-Live · L0-9 Data Grounding | ⚠ Partial | Specs + internal validation done; client-tenant go-live and HANA Cloud Vector persistence pending. |
 
-**The material gaps are stack-alignment, not behavioural defects** — see the reports for the
-per-check breakdown and the resolution path (a deferred, separately-authorized code migration).
+**The open items are enablement/go-live steps, not behavioural defects** — see
+`docs/agent-checklist-assessment.md` for the per-pillar breakdown and evidence.
 
 ## 4. Flagged items — tenant / follow-up
 | Item | Issue | Remediation |
@@ -80,4 +76,4 @@ per-check breakdown and the resolution path (a deferred, separately-authorized c
 ## 7. Next steps
 1. Restrict CORS and add ruff/mypy/bandit CI (quick, in-repo).
 2. Validate against the Adarsh Tokyo S/4 landscape with IAS principal propagation.
-3. If a literal Quality-Gate PASS is required, schedule the authorized code migration (ADR-0004 scope).
+3. Complete the remaining partial pillars (L0-7 go-live, L0-9 HANA Cloud persistence) per `docs/agent-checklist-assessment.md`.

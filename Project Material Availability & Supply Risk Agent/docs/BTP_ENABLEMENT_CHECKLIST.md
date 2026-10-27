@@ -36,6 +36,12 @@ Legend: `[ ]` to do · **Gate** = don't proceed until this passes · Owner in (b
 - [ ] D3. Demo dry-run end to end in Adarsh DEV. (all)
 - [ ] D4. Close the tenant-side checklist items (benchmarking, safety dashboard, cross-functional sign-off — see `agent-outcome-report.md`). (Adarsh AI governance)
 
+### Phase E — Decision/approval persistence (HANA Cloud)
+- [ ] E1. HANA Cloud instance + schema available in the subaccount (provision if absent). (Adarsh DBA / BTP admin)
+- [ ] E2. Create `ZAGENT_DECISION_LOG` (+ vector table) under a technical user with an **INSERT/SELECT-only** role. (Adarsh DBA)
+- [ ] E3. Enable the HANA Cloud Vector Engine (semantic recall of prior decisions). (Adarsh DBA)
+- [ ] E4. Share HANA service key or bind the HANA (HDI/schema) service to the CF app; set `MEMORY_BACKEND=hana`. (us + Adarsh)
+
 ---
 
 **What goes in the Adarsh confirmation mail = the prerequisites behind B1–B4, C2–C4** (IAS

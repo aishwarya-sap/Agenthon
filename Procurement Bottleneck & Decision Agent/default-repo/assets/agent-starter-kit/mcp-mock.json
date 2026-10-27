@@ -1,32 +1,26 @@
 {
-  "metadata": {
-    "description": "Mock responses for offline testing. Keys under 'servers' are ORD IDs matching the live Agent Gateway APIs.",
-    "usage": "Tools in app/tools.py read responses from here when IBD_TESTING=1"
-  },
-  "servers": {
-    "sap.s4:apiResource:MY_DOMAIN_API:v1": {
-      "mcp_server_name": "sap.s4:apiResource:MY_DOMAIN_API:v1",
-      "description": "TODO: replace with your real SAP API ORD ID from SAP Business Accelerator Hub",
-      "responses": {
-        "get_sap_data": {
-          "results": [
-            {
-              "id": "MOCK-001",
-              "description": "Mock result 1 — replace with real SAP data shape",
-              "status": "Open",
-              "amount": 10000
-            },
-            {
-              "id": "MOCK-002",
-              "description": "Mock result 2 — replace with real SAP data shape",
-              "status": "Delayed",
-              "amount": 25000
-            }
-          ],
-          "total": 2,
-          "source": "MOCK"
-        }
+  "tools": [
+    {
+      "name": "get_sample_data",
+      "description": "Returns sample SAP data for testing. Replace with real tools in Sprint 2.",
+      "response": {
+        "status": "ok",
+        "signal_status": "simulated",
+        "data": [
+          { "id": "DEMO-001", "description": "Sample record 1", "value": 1000.00 },
+          { "id": "DEMO-002", "description": "Sample record 2", "value": 2500.50 }
+        ],
+        "note": "This is mock data. Connect to real SAP system in Sprint 2."
+      }
+    },
+    {
+      "name": "check_status",
+      "description": "Returns a mock status check. Replace with real S/4HANA status check in Sprint 2.",
+      "response": {
+        "status": "green",
+        "signal_status": "simulated",
+        "message": "Mock: all systems nominal. Connect to real SAP system in Sprint 2."
       }
     }
-  }
+  ]
 }

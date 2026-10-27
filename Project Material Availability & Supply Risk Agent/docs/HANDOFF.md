@@ -34,8 +34,8 @@ Design decisions: LangChain/LangGraph · Single agent · Advisory-only + HITL ·
 | `docs/specs/design-brief.md` | Confirmed design decisions (D0–D12) |
 | `docs/specs/technical-specification.md` | As-built design: components, data model, real S/4 OData services + entities, security, deployment |
 | `docs/specs/rtm.md` | Requirements → implementation → test traceability (100%) |
-| `docs/quality-gate-report.md` | Quality-gate results (PASS) |
-| `docs/code-review-report.md` | Code-review results (PASS) |
+| `docs/checklists/agent-checklist-L0-L10.md` | GDH APAC Agent Checklist v5 (10-pillar / 60-item) |
+| `docs/agent-checklist-assessment.md` | Per-pillar readiness status for this agent |
 | `CODE_WALKTHROUGH.md` | Module map + request lifecycle |
 
 ---

@@ -116,6 +116,27 @@ For go-live testing, create named users in S/4 with emails matching their IAS lo
 
 ---
 
+## P4 — Decision/approval persistence (HANA Cloud)
+
+The agent persists every recommendation and HoD approval to an **append-only** audit table on
+**HANA Cloud** (`ZAGENT_DECISION_LOG`), and optionally uses the **HANA Cloud Vector Engine** for
+semantic recall of prior decisions. This is the durable backend behind the agent's institutional
+memory (today it runs in-process for the mock/demo; `MEMORY_BACKEND=hana` switches it over).
+
+### 12. HANA Cloud instance + audit schema (DBA / BTP admin task)
+- [ ] HANA Cloud instance available in the BTP subaccount (or provision one)
+- [ ] Schema created for the agent (e.g. `ADARSH_AGENT`)
+- [ ] Audit table `ZAGENT_DECISION_LOG` created (+ a vector table for semantic recall)
+- [ ] **Technical user with an INSERT/SELECT-only role** on that schema (no UPDATE/DELETE — preserves
+  the append-only audit guarantee)
+- [ ] HANA Cloud **Vector Engine** enabled (needed for semantic recall)
+- [ ] Credentials shared via a HANA **service key**, or the HANA instance **bound to the CF app**
+  as an HDI-container / schema service (preferred — credentials arrive via `VCAP_SERVICES`, no secret
+  in env)
+- [ ] Any data-residency / retention policy for stored decisions confirmed
+
+---
+
 ## Summary checklist by phase
 
 ```
@@ -135,6 +156,11 @@ Phase C — S/4 on-prem connectivity
   [ ] P2.4  OData services activated
   [ ] P3.1  Demo users created
   [ ] P3.2  Sample data confirmed
+
+Phase D — Decision persistence
+  [ ] P4.1  HANA Cloud instance + schema
+  [ ] P4.2  ZAGENT_DECISION_LOG (+ vector table) + INSERT/SELECT-only role
+  [ ] P4.3  HANA service key shared or bound to CF app
 ```
 
 ---
@@ -148,6 +174,7 @@ Phase C — S/4 on-prem connectivity
 | SCC install + S/4 exposure | Adarsh Basis team |
 | Principal propagation (STRUST/SNC) | Adarsh Basis team |
 | IAS app configuration (B2/B3) | Adarsh IAS admin (or BAI team with admin access) |
+| HANA Cloud instance + schema + INSERT/SELECT role | Adarsh DBA / BTP admin |
 | CF agent deployment, Joule YAML deploy | BAI team (us) |
 | Demo user creation | Adarsh Basis / security team |
 

@@ -17,7 +17,7 @@ action for human approval, and answers free-form questions — every quantitativ
 2. `docs/specs/functional-specification.md` — what it does.
 3. `docs/specs/technical-specification.md` — how it's built (modules, flow, integration).
 4. `docs/decisions/` — the ADRs behind the non-obvious choices.
-5. `docs/quality-gate-report.md` + `docs/code-review-report.md` — production-readiness status.
+5. `docs/checklists/agent-checklist-L0-L10.md` (v5 checklist) + `docs/agent-checklist-assessment.md` — production-readiness status.
 
 ## 3. Run it locally (5 minutes, no SAP needed)
 
@@ -54,5 +54,5 @@ procurement-bottleneck-agent IBD_TESTING 0 && cf restart procurement-bottleneck-
 ## 6. Provenance
 
 Hand-built to the SAP GDH AI Factory standard (not copier-generated). Production readiness is tracked
-against the authoritative **Quality Gate** (`docs/checklists/quality-gate-checklist.md`) and
-**Code Review** (`docs/checklists/code-review-checklist.md`) checklists — see the reports in `docs/`.
+against the authoritative **GDH APAC Agent Checklist v5** (10-pillar / 60-item):
+`docs/checklists/agent-checklist-L0-L10.md` — per-pillar status in `docs/agent-checklist-assessment.md`.

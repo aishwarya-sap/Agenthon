@@ -121,6 +121,29 @@ class MemoryStore:
         )
 
 
+class HanaMemoryStore(MemoryStore):
+    """PLACEHOLDER — durable HANA Cloud audit store for recommendations/approvals.
+
+    Persists each DecisionRecord to ``<HANA_SCHEMA>.<HANA_DECISION_TABLE>`` (append-only,
+    backed by an INSERT/SELECT-only role) and uses the HANA Cloud Vector Engine
+    (``HANA_VECTOR_TABLE``) for semantic recall of the free-text annotation — behind this
+    exact ``MemoryStore`` interface, so business logic and tests do not change.
+
+    Not wired yet: requires the ``hdbcli`` driver and a provisioned/bound HANA Cloud
+    instance. Selected only when ``MEMORY_BACKEND=hana``. See the client prerequisites +
+    data-readiness questionnaire (docs/) for what the client must provision.
+    """
+
+    def __init__(self) -> None:  # pragma: no cover - placeholder, not reachable in tests
+        raise NotImplementedError(
+            "HANA Cloud persistence is a placeholder. To enable MEMORY_BACKEND=hana: "
+            "provision HANA Cloud, create the ZAGENT_DECISION_LOG table (+ vector table) "
+            "under a schema with an INSERT/SELECT-only role, add the `hdbcli` dependency, "
+            "and implement append()/append_outcome()/recall() against it. "
+            "See docs/ADARSH_CLIENT_PREREQUISITES.md §HANA Cloud."
+        )
+
+
 # Process-wide store for the MVP. A durable HANA-backed store is injected at
 # construction time in production; nothing else changes.
 _STORE: MemoryStore | None = None
@@ -129,7 +152,10 @@ _STORE: MemoryStore | None = None
 def get_memory_store() -> MemoryStore:
     global _STORE
     if _STORE is None:
-        _STORE = MemoryStore()
+        if config.memory_backend() == "hana":
+            _STORE = HanaMemoryStore()  # placeholder — raises until implemented
+        else:
+            _STORE = MemoryStore()
     return _STORE
 
 

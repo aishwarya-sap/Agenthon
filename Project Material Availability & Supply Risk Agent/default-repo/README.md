@@ -69,6 +69,25 @@ CF_APP_DOMAIN=cfapps.ap20.hana.ondemand.com cf push -f manifest.yml
 
 ---
 
+## Persistence — recommendations & approvals (Sprint 4)
+
+The agent persists its recommendations and approvals to an **append-only** backend table on
+**HANA Cloud** (the audit trail), with the HANA Cloud **Vector Engine** for optional semantic recall
+of prior decisions. Selected via `MEMORY_BACKEND` in `.env` (default `in_memory` for Sprint 1 mock):
+
+```bash
+MEMORY_BACKEND=in_memory    # Sprint 1/2 — in-process store (mock, tests)
+# MEMORY_BACKEND=hana       # Sprint 4 — durable HANA Cloud audit table (ZAGENT_DECISION_LOG)
+```
+
+**Seam pattern:** keep one `MemoryStore` interface (`append()` / `recall()`); implement a
+`HanaMemoryStore` behind the same interface and select it when `MEMORY_BACKEND=hana`. Business logic
+and tests do not change. Use a technical user with an **INSERT/SELECT-only** role (append-only audit).
+On CF, bind a HANA (HDI-container / schema) service — credentials arrive via `VCAP_SERVICES`, never in
+env. See `docs/data_readiness_questionnaire.md` §HANA Cloud for what to request from the client.
+
+---
+
 ## Governance
 
 Review the [Agent Checklist](governance/agent_checklist_L0_to_L10.md) at the end of each sprint.

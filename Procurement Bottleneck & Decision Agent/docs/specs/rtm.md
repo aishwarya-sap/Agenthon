@@ -32,5 +32,5 @@ All 9 functional requirements implemented and test-covered. 134 tests, coverage 
 | `resilience.py` | FR-9 (terminal quota handling) |
 | `sanitize.py` / `auth_ias.py` / `observability.py` | cross-cutting security + guardrails (FS §2.3) |
 
-Non-functional + security requirements (FS §2.3, §5) are evaluated in `docs/quality-gate-report.md`
-and `docs/code-review-report.md` against the QG/CR checklists.
+Non-functional + security requirements (FS §2.3, §5) are evaluated in `docs/agent-checklist-assessment.md`
+against the v5 Agent Checklist (10 pillars).

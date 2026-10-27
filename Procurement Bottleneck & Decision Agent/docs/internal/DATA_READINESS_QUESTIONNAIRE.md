@@ -87,6 +87,22 @@ For each OData service the agent uses, please confirm it is active in your syste
 
 ---
 
+## Section HANA — Decision/approval persistence (HANA Cloud)
+
+The agent stores its recommendations and approvals in an append-only HANA Cloud table (audit trail),
+with optional Vector Engine semantic recall. Confirm so this can be provisioned.
+
+| # | Item | Answer |
+|---|---|---|
+| H1 | Is a HANA Cloud instance available in the BTP subaccount (or should one be provisioned)? | |
+| H2 | Can a schema (e.g. `ADARSH_AGENT`) + the `ZAGENT_DECISION_LOG` table (+ vector table) be created? | |
+| H3 | Can a technical user be created with an **INSERT/SELECT-only** role (no update/delete)? | |
+| H4 | Share credentials via a HANA service key, or bind the HANA instance to the CF app (HDI/schema)? | |
+| H5 | Is the HANA Cloud Vector Engine enabled (needed for semantic recall)? | |
+| H6 | Any data-residency / retention requirements for the stored decisions? | |
+
+---
+
 ## Section F — Timeline confirmation
 
 | # | Item | Target date |

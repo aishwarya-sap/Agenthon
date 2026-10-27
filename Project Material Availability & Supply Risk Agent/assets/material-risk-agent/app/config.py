@@ -105,3 +105,28 @@ def s4_service(name: str) -> str:
     profile = s4_service_profile()
     names = _SERVICE_NAMES.get(profile, _SERVICE_NAMES["cloud"])
     return names[name]
+
+
+# --- Decision/approval persistence (HANA Cloud) -----------------------------
+# The agent persists its decision/intervention records to an append-only audit
+# store. Default is the in-process MemoryStore (mock-first MVP + offline tests).
+# Set MEMORY_BACKEND=hana to select the durable HANA Cloud backend
+# (ZAGENT_DECISION_LOG table, INSERT/SELECT-only role, + Vector Engine recall).
+HANA_DECISION_TABLE = os.environ.get("HANA_DECISION_TABLE", "ZAGENT_DECISION_LOG")
+HANA_VECTOR_TABLE = os.environ.get("HANA_VECTOR_TABLE", "ZAGENT_DECISION_VEC")
+HANA_SCHEMA = os.environ.get("HANA_SCHEMA", "")
+
+
+def memory_backend() -> str:
+    """Persistence backend for the decision log: 'in_memory' (default) or 'hana'."""
+    return os.environ.get("MEMORY_BACKEND", "in_memory").strip().lower()
+
+
+def hana_configured() -> bool:
+    """True when HANA Cloud connection placeholders are present (host + user).
+
+    Independent of MEMORY_BACKEND so deployment can verify the binding before
+    flipping the backend. On CF the credentials arrive via VCAP_SERVICES (bound
+    HANA/HDI service); locally they come from HANA_* env vars.
+    """
+    return bool(os.environ.get("HANA_HOST") and os.environ.get("HANA_USER"))
