@@ -1,0 +1,10 @@
+apiVersion: solution.sap/v1
+kind: Solution
+
+metadata:
+  name: material-risk-cfe01
+  version: "1.0.0"
+  description: "Project Material Availability & Supply Risk Agent — Joule 2.0 A2A agent + chat UI"
+
+assets:
+  - ref: ./assets/material-risk-agent/asset.yaml

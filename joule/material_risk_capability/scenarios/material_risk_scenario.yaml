@@ -1,0 +1,18 @@
+# Scenario = the intent-matching shell. Joule selects this scenario when the user's
+# question matches the description below, then executes the target function.
+#
+# Keep the description broad enough to cover all the agent's natural entry points:
+# availability checks, supplier risk, schedule consequence, expedite decisions.
+# If you add a second scenario (e.g. a pure "what-if simulation" flow), give it a
+# tighter description and point it at a separate function.
+description: >-
+  Use when the user asks about material availability or supply risk for a construction
+  or engineering project; which materials or purchase orders are delayed or missing;
+  whether scheduled construction activities can start on time given current stock and
+  supplier delivery status; the schedule or cost impact of a material shortage; how
+  to respond to a critical or high-risk supply gap (expedite, escalate, or source
+  from an alternative supplier); or for a ranked risk report across all project
+  materials.
+target:
+  name: material_risk_function
+  type: function

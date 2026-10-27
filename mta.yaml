@@ -1,0 +1,82 @@
+_schema-version: "3.3.0"
+ID: material-risk-cfe01
+version: 1.0.0
+description: material-risk-agent + Joule-style Chat UI
+
+modules:
+
+  # ── Agent (Python) ──────────────────────────────────────────────
+  - name: material-risk-agent
+    type: python
+    path: assets/material-risk-agent
+    parameters:
+      buildpack: python_buildpack
+      # 1G, not 512M: langchain + summarization middleware need the headroom. A no-LLM
+      # echo agent (like hello-world) runs in 512M — drop it back if the agent never
+      # loads langchain/langgraph. See guidelines-cf-deployment.md § Memory sizing.
+      memory: 1G
+      disk-quota: 1G
+      health-check-type: http
+      health-check-http-endpoint: /.well-known/agent.json
+    build-parameters:
+      builder: custom
+      # Do NOT pip-install locally: the CF python_buildpack installs requirements.txt at
+      # staging using the runtime.txt-pinned Python. A local build-time `pip install` runs
+      # under whatever Python `mbt` finds on the build machine — if that's newer than the
+      # pin's supported range (e.g. Python 3.14 vs a dep capped at <3.14), the build fails on
+      # a machine that never runs the app. Just package the module dir; the buildpack installs.
+      commands:
+        - echo "deps installed by CF python_buildpack from requirements.txt at staging"
+      build-result: .
+    properties:
+      HOST: 0.0.0.0
+      AGENT_PUBLIC_URL: ${default-url}
+      # No-auth demo only: if the agent extracts a JWT subject (get_user_sub) but there's no
+      # XSUAA in front, no token arrives and it raises "No user token in context" — failing
+      # every turn. IBD_TESTING=1 degrades that to a stable "unknown" subject. Remove for the
+      # production tier, where XSUAA supplies the JWT. Omit if the agent has no such call.
+      IBD_TESTING: "1"
+      # AI Core credentials — REQUIRED for every LLM turn if the agent calls the model (skip
+      # for a no-LLM echo agent). They are NOT set here and NOT via cf set-env: they come from
+      # the bound `aicore-creds` service (see `requires:` below + the `resources:` section).
+      # app/_boot.py copies them from VCAP_SERVICES into AICORE_* at startup, so they are
+      # present on the FIRST start — no deploy-green-but-fail-at-turn, no restart. Create the
+      # shared service once (reused by every agent):
+      #   cf create-user-provided-service aicore-creds -p \
+      #     '{"AICORE_CLIENT_ID":"<id>","AICORE_CLIENT_SECRET":"<secret>",
+      #       "AICORE_AUTH_URL":"<auth-url>","AICORE_BASE_URL":"<base-url>"}'
+      # See guidelines-cf-deployment.md § AI Core credentials.
+    provides:
+      - name: agent-api
+        properties:
+          agent-url: ${default-url}
+    requires:
+      - name: aicore-creds
+
+  # ── UI (Node.js Express) ─────────────────────────────────────────
+  - name: material-risk-ui
+    type: nodejs
+    path: assets/material-risk-ui
+    parameters:
+      buildpack: nodejs_buildpack
+      memory: 256M
+      disk-quota: 512M
+    build-parameters:
+      builder: npm
+      build-result: .
+    properties:
+      AGENT_URL: ~{agent-api/agent-url}
+    requires:
+      - name: agent-api
+
+resources:
+  # Shared AI Core credentials, bound (not set-env'd) so they are present on first start and
+  # reused across agents. `existing-service` REFERENCES a user-provided (or managed) service
+  # created out-of-band — redeploy/undeploy of this agent never touches the shared creds.
+  # Omit this whole section (and the agent module's `requires: aicore-creds`) for a no-LLM
+  # echo agent. See guidelines-cf-deployment.md § AI Core credentials.
+  - name: aicore-creds
+    type: org.cloudfoundry.existing-service
+    parameters:
+      service-name: aicore-creds
+

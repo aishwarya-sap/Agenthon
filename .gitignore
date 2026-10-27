@@ -1,0 +1,33 @@
+# SAP build artifacts
+mta_archives/
+*.mtar
+.mta_build/
+
+# IDE / OS / Claude Code session data
+.idea/
+.vscode/
+.DS_Store
+*.swp
+.claude/
+
+# Coverage reports
+**/coverage.xml
+**/lcov.info
+
+# Secrets — never commit
+**/.env
+**/*.env
+**/BAI-AICore-Credentials*
+
+# Python
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/.coverage
+**/coverage.json
+**/test_report.json
+**/.venv/
+**/venv/
+
+# Node
+**/node_modules/

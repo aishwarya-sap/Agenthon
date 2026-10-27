@@ -1,0 +1,62 @@
+apiVersion: asset.sap/v1
+kind: Asset
+type: agent
+
+metadata:
+  name: material-risk-agent
+  version: "1.0.0"
+  labels:
+    domain: procurement-supply-risk
+    advisory-only: "true"
+
+provides:
+  apis:
+    - name: material-risk-agent
+      kind: a2a
+      ordId: customer.build:apiResource:material-risk-cfe01.material-risk-agent:v1
+
+# Tool / data dependency map (checklist 10.2). In production these MCP servers
+# and the vector store back the read tools; the tool names/shapes are unchanged
+# between mock and live.
+requires:
+  - name: s4-materials-management
+    kind: mcp-server
+    ordId: sap.s4:apiResource:MATERIAL_STOCK_PO_SRV:v1
+    access: read-only
+    apis: [MARD, EKKO, EKPO, EBAN, MSEG, MKPF, LFA1, EORD, EINE]
+  - name: s4-project-system
+    kind: mcp-server
+    ordId: sap.s4:apiResource:PROJECT_MATERIAL_SRV:v1
+    access: read-only
+    apis: [PRPS, VORGN, RESB, AFVV]
+  - name: hana-vector-engine
+    kind: vector-store
+    ordId: sap.hana:vectorEngine:ZAGENT_MATERIAL_RISK:v1
+    access: read-write
+
+container:
+  buildPath: .
+  port: 5000
+
+observability:
+  tracing: step-level
+  logs: structured-json
+
+probes:
+  startup:
+    path: /.well-known/agent.json
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 18
+  liveness:
+    path: /.well-known/agent.json
+    initialDelaySeconds: 15
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+  readiness:
+    path: /.well-known/agent.json
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 3

@@ -1,0 +1,40 @@
+---
+# manifest.yml — SAP A2A Agent + Chat UI
+# Deploy with: ./deploy.sh (prompts for CF domain)
+# Or set CF_APP_DOMAIN env var before running: CF_APP_DOMAIN=cfapps.ap20.hana.ondemand.com cf push -f manifest.yml
+
+applications:
+
+  # ── Agent (Python) ────────────────────────────────────────────────────────
+  - name: agent-starter-kit
+    path: assets/agent-starter-kit
+    memory: 1G
+    disk_quota: 2G
+    instances: 1
+    buildpacks:
+      - python_buildpack
+    command: python app/_boot.py
+    timeout: 180
+    health-check-type: http
+    health-check-http-endpoint: /.well-known/agent.json
+    routes:
+      - route: agent-starter-kit.${CF_APP_DOMAIN}
+    env:
+      AGENT_PUBLIC_URL: https://agent-starter-kit.${CF_APP_DOMAIN}/
+      # Non-secret config only. AICORE_* and other secrets are supplied by .env
+      # or by cf set-env after first push.
+
+  # ── Chat UI (Node.js) ─────────────────────────────────────────────────────
+  - name: agent-starter-kit-ui
+    path: assets/agent-starter-kit-ui
+    memory: 256M
+    disk_quota: 512M
+    instances: 1
+    buildpacks:
+      - nodejs_buildpack
+    command: node server.js
+    timeout: 120
+    routes:
+      - route: agent-starter-kit-ui.${CF_APP_DOMAIN}
+    env:
+      AGENT_URL: https://agent-starter-kit.${CF_APP_DOMAIN}

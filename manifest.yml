@@ -1,0 +1,56 @@
+---
+# Cloud Foundry deployment manifest — Material Risk Agent + Chat UI
+#
+# Deploy with: ./deploy.sh  (prompts for CF domain)
+# Or manually: CF_APP_DOMAIN=cfapps.ap20.hana.ondemand.com cf push -f manifest.yml
+#
+# Common CF domains:
+#   us10 (US East):        cfapps.us10-001.hana.ondemand.com
+#   eu10 (EU West):        cfapps.eu10.hana.ondemand.com
+#   ap10 (Australia):      cfapps.ap10.hana.ondemand.com
+#   ap20 (Singapore/SEA):  cfapps.ap20.hana.ondemand.com
+#   ap21 (Singapore):      cfapps.ap21.hana.ondemand.com
+#
+# Secrets (AICORE_*, S4_API_KEY, IAS_*) live in assets/material-risk-agent/.env
+# (git-ignored) and ship with the push. Only non-secret config is set below.
+
+applications:
+
+  # ── Agent (Python / A2A) ──────────────────────────────────────────────────
+  - name: material-risk-agent
+    path: assets/material-risk-agent
+    memory: 1G
+    disk_quota: 1G
+    instances: 1
+    buildpacks:
+      - python_buildpack
+    command: python app/_boot.py
+    health-check-type: http
+    health-check-http-endpoint: /.well-known/agent-card.json
+    timeout: 180
+    routes:
+      - route: material-risk-agent.${CF_APP_DOMAIN}
+    env:
+      AGENT_PUBLIC_URL: https://material-risk-agent.${CF_APP_DOMAIN}/
+    # ── On-prem / client deployment: uncomment to bind the Destination service ──
+    # Required when S4_SERVICE_PROFILE=onprem (Adarsh + all on-prem clients).
+    # Create the service instance first:
+    #   cf create-service destination lite destination-service
+    # Then uncomment:
+    # services:
+    #   - destination-service
+
+  # ── Chat UI (Node.js Express) ─────────────────────────────────────────────
+  - name: material-risk-ui
+    path: assets/material-risk-ui
+    memory: 256M
+    disk_quota: 512M
+    instances: 1
+    buildpacks:
+      - nodejs_buildpack
+    command: node server.js
+    timeout: 120
+    routes:
+      - route: material-risk-ui.${CF_APP_DOMAIN}
+    env:
+      AGENT_URL: https://material-risk-agent.${CF_APP_DOMAIN}

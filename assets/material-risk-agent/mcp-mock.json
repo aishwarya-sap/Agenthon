@@ -1,0 +1,38 @@
+{
+  "metadata": {
+    "description": "Declarative tool + MCP-server catalog for the Project Material Risk agent. In demo/test mode (IBD_TESTING=1) the agent serves the 15 in-process tools built in app/tools.py (which compute over app/domain/ and the seeded scenario); this file is the ORD-keyed catalog those tools mirror, used for the tool-dependency map (checklist 10.2) and catalog/consistency tests. ORD keys match asset.yaml requires[].",
+    "scenario": "Project P-ALPHA-01 (Tower Alpha): structural steel 1000234 on the critical-path Level 3 Slab Pour (A-300) is 14 days late (confirmed 2026-10-30 vs required 2026-10-16), float -3, supplier ABC Steel (1001) chronically late (last 4: +9/+12/+8/+8). Plus a HIGH, a MEDIUM and a clean material."
+  },
+  "servers": {
+    "s4-materials-management": {
+      "mcp_server_name": "sap.s4:apiResource:MATERIAL_STOCK_PO_SRV:v1",
+      "tools": {
+        "get_project_material_requirements": {"side_effect": false, "description": "Project material line items (material, required qty/date, activity, float)."},
+        "parse_excel_project_schedule": {"side_effect": false, "description": "Parse the Phase-1 Excel project schedule into structured activities."},
+        "get_material_stock_position": {"side_effect": false, "description": "Unrestricted stock (QI/blocked excluded)."},
+        "get_open_purchase_orders_and_prs": {"side_effect": false, "description": "Open POs/PRs with confirmed delivery dates, qty, vendor."},
+        "get_consolidation_material_master": {"side_effect": false, "description": "Material master planning data (safety stock, reorder point, lead time)."},
+        "compute_material_availability_gaps": {"side_effect": false, "description": "Net-availability gaps and risk bands for every material in a project."},
+        "get_supplier_delivery_history": {"side_effect": false, "description": "Last deliveries for a vendor x material with on-time rate and chronic-late flag."},
+        "predict_delivery_outcome": {"side_effect": false, "description": "Predict delay range and on-time probability from history."},
+        "update_po_delivery_date_or_create_expedite_po": {"side_effect": true, "description": "WRITE (gated): update a PO delivery date or create an expedite PO (advisory demo)."}
+      }
+    },
+    "s4-project-system": {
+      "mcp_server_name": "sap.s4:apiResource:PROJECT_MATERIAL_SRV:v1",
+      "tools": {
+        "simulate_schedule_consequence": {"side_effect": false, "description": "Simulate schedule + cost consequence of a supply gap; score recovery options."},
+        "recommend_procurement_action": {"side_effect": false, "description": "Ranked, role-aware recommendation (alt sourcing HoD-only)."},
+        "draft_supplier_expedite_communication": {"side_effect": false, "description": "Pre-populated expedite email for an at-risk material."},
+        "trigger_escalation_workflow": {"side_effect": true, "description": "WRITE (gated): route a risk to Purchase Manager / Project Management."}
+      }
+    },
+    "hana-vector-engine": {
+      "mcp_server_name": "sap.hana:vectorEngine:ZAGENT_MATERIAL_RISK:v1",
+      "tools": {
+        "retrieve_schedule_and_supplier_context": {"side_effect": false, "description": "RAG retrieval over schedule rows, supplier emails and vendor scorecards (similarity gate + injection/PII sanitised)."},
+        "write_intervention_outcome_to_memory": {"side_effect": true, "description": "WRITE (gated): persist an intervention outcome to institutional memory."}
+      }
+    }
+  }
+}

@@ -1,0 +1,25 @@
+# Function = the executable logic. Two actions:
+#   1. agent-request  → call the remote CF agent over A2A (via the BTP destination)
+#   2. message        → render the agent's text artifact back to the Joule user
+#
+# The agent returns a 7-section markdown report (Verdict / Signal Coverage /
+# SAP Findings / External Evidence / Simulation Results / Ranked Recommendations /
+# Awaiting Approval). Joule renders the first artifact's first text part, which
+# is the full report. If the report requests approval (HITL gate), the user types
+# "approve" or "confirm" in the next Joule turn and the agent executes the write.
+#
+# A2A protocol notes:
+#   - result.artifacts[0].parts[0].text  → the completed report (streaming: last event)
+#   - If the agent is still processing, result.status.message.parts[0].text carries
+#     live status updates; the final artifact supersedes these.
+#   - The contextId is maintained by the A2A proxy across Joule turns (multi-turn).
+action_groups:
+  - actions:
+      - type: agent-request
+        system_alias: MATERIAL_RISK_AGENT   # resolves to BTP Destination (see capability.sapdas.yaml)
+        agent_type: remote                  # remote = code-based A2A agent on CF
+        result_variable: "apiResponse"
+      - type: message
+        message:
+          type: text
+          content: "<? apiResponse.body.artifacts[0].parts[0].text ?>"

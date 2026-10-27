@@ -1,0 +1,38 @@
+# Joule pro-code capability for the Project Material Availability & Supply Risk Agent.
+#
+# Deploy via the Joule CLI — NOT the Studio UI. This file registers the agent as a
+# Joule Capability so procurement / project-management users can invoke it from the
+# Joule panel. Joule routes an intent-matched question to the scenario, runs the
+# function, which calls our remote CF agent over A2A through the MATERIAL_RISK_AGENT
+# BTP destination.
+#
+# Pre-requisites (complete these before deploying — see docs/INTEGRATION_GUIDE.md):
+#   1. CF agent is deployed: https://material-risk-agent.<cf-domain>/.well-known/agent.json → HTTP 200
+#   2. BTP Destination "MATERIAL_RISK_AGENT" exists with Authentication=OAuth2JWTBearer,
+#      pointing at the CF agent URL (see INTEGRATION_GUIDE.md §3 for exact fields)
+#   3. IAS app2app trust is wired (Proxy → Custom-Agent IAS apps) for user propagation
+#   4. BTP↔IAS trust is configured in the BTP subaccount
+#
+# After deployment:
+#   joule capability deploy --path ./da.sapdas.yaml --subaccount <subaccount-id>
+#
+schema_version: 3.27.0            # minimum schema for A2A agent integration
+
+metadata:
+  namespace: joule.ext            # MUST be joule.ext (any other value triggers error 5013/5014)
+  name: material_risk_capability
+  version: 1.0.0
+  display_name: Project Material Supply Risk
+  description: >-
+    Analyses SAP project material requirements against stock, open POs/PRs, and supplier
+    GR history to identify supply gaps that will block scheduled construction activities.
+    Predicts supplier delivery dates, simulates schedule and cost consequences, and
+    recommends expedite, escalate, or alternative-source actions. Advisory and read-only
+    (all write actions require explicit human approval).
+
+# BTP Destination name → your CF agent URL. The destination uses OAuth2JWTBearer so
+# the end-user's IAS identity is propagated through to the agent and on to S/4HANA.
+# See INTEGRATION_GUIDE.md §3 for the exact destination configuration fields.
+system_aliases:
+  MATERIAL_RISK_AGENT:
+    destination: MATERIAL_RISK_AGENT   # BTP Destination Service name (case-sensitive)
