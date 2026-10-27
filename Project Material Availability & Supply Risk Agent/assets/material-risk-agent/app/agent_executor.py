@@ -46,6 +46,10 @@ class AgentExecutor(A2AAgentExecutor):
             task = new_task(context.message)
             await event_queue.enqueue_event(task)
 
+        # Reset the live-fallback flag so a prior turn's fallback can't leak into this one.
+        from domain import data
+        data.reset_degraded()
+
         # Load MCP tools — user token is read from context var set by JWTContextMiddleware
         tools = []
         try:

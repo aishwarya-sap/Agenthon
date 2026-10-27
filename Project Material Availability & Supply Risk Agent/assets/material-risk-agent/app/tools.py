@@ -35,7 +35,9 @@ def _dump(obj: Any) -> str:
 
 
 def _live(payload: dict) -> dict:
-    payload.setdefault("signal_status", "live")
+    # If any live read this turn fell back to seeded data, label the signal
+    # "simulated" so the agent never presents fallback data as live.
+    payload.setdefault("signal_status", "simulated" if data.reads_degraded() else "live")
     return payload
 
 

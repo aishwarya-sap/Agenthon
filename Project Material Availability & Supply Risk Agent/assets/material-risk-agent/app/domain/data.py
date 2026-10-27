@@ -16,9 +16,40 @@ on real SAP data. get_activities remains seeded (no SAP PS OData in Phase 1).
 """
 from __future__ import annotations
 
+import contextvars
+import logging
 from datetime import date
 
 import config
+
+logger = logging.getLogger(__name__)
+
+# Set when a live read fails and we serve seeded data instead (live-fallback mode).
+# Read by the tool layer so fallback data is tagged "simulated", never "live".
+_DEGRADED: contextvars.ContextVar[bool] = contextvars.ContextVar("reads_degraded", default=False)
+
+
+def reset_degraded() -> None:
+    """Clear the fallback flag at the start of each turn."""
+    _DEGRADED.set(False)
+
+
+def reads_degraded() -> bool:
+    """True if any live read in this turn fell back to seeded data."""
+    return _DEGRADED.get()
+
+
+async def _live_or_fallback(live_coro, mock_fn):
+    """Await a live S/4 read; on failure, fall back to seeded data IF live-fallback
+    mode is on (both flags set). In live-only mode the error propagates as before."""
+    try:
+        return await live_coro
+    except Exception as exc:
+        if config.is_live_fallback():
+            logger.warning("live S/4 read failed (%s); serving seeded data (signal=simulated)", exc)
+            _DEGRADED.set(True)
+            return mock_fn()
+        raise
 
 def today() -> date:
     """Current system date, resolved live on every call.
@@ -205,10 +236,10 @@ def get_stock(material: str) -> dict:
 
 
 async def get_stock_async(material: str) -> dict:
-    """Async accessor — routes to live S4 when IBD_LIVE_S4=1, mock otherwise."""
+    """Async accessor — live S4 when IBD_LIVE_S4=1 (seeded fallback if also IBD_TESTING=1), mock otherwise."""
     if config.is_live_s4():
         import s4_client
-        return await s4_client.get_stock_live(material)
+        return await _live_or_fallback(s4_client.get_stock_live(material), lambda: get_stock(material))
     return get_stock(material)
 
 
@@ -223,12 +254,16 @@ def get_orders(material: str | None = None, doc_type: str | None = None) -> list
 
 
 async def get_orders_async(material: str | None = None, doc_type: str | None = None) -> list[dict]:
-    """Async accessor — routes to live S4 when IBD_LIVE_S4=1, mock otherwise."""
+    """Async accessor — live S4 when IBD_LIVE_S4=1 (seeded fallback if also IBD_TESTING=1), mock otherwise."""
     if config.is_live_s4():
         import s4_client
-        pos = await s4_client.get_purchase_orders_live(material)
-        prs = await s4_client.get_purchase_requisitions_live(material)
-        rows = pos + prs
+
+        async def _live() -> list[dict]:
+            pos = await s4_client.get_purchase_orders_live(material)
+            prs = await s4_client.get_purchase_requisitions_live(material)
+            return pos + prs
+
+        rows = await _live_or_fallback(_live(), lambda: get_orders(material=material))
         if doc_type:
             rows = [o for o in rows if o.get("doc_type") == doc_type]
         return rows
@@ -242,10 +277,14 @@ def get_gr_history(vendor: str, material: str, n: int = 4) -> list[dict]:
 
 
 async def get_gr_history_async(vendor: str, material: str, n: int = 4) -> list[dict]:
-    """Async accessor — routes to live S4 when IBD_LIVE_S4=1, mock otherwise."""
+    """Async accessor — live S4 when IBD_LIVE_S4=1 (seeded fallback if also IBD_TESTING=1), mock otherwise."""
     if config.is_live_s4():
         import s4_client
-        return (await s4_client.get_gr_history_live(vendor, material))[:n]
+        rows = await _live_or_fallback(
+            s4_client.get_gr_history_live(vendor, material),
+            lambda: get_gr_history(vendor, material, n),
+        )
+        return rows[:n]
     return get_gr_history(vendor, material, n)
 
 

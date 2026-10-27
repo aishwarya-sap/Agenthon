@@ -24,6 +24,13 @@ def is_live_s4() -> bool:
     return os.environ.get("IBD_LIVE_S4", "").strip().lower() in ("1", "true", "yes", "on")
 
 
+def is_live_fallback() -> bool:
+    """True when BOTH IBD_LIVE_S4 and IBD_TESTING are set — live-first, fall back
+    to seeded data if a live read fails. Keeps the agent answering when the shared
+    sandbox is unavailable; the fallback data is tagged 'simulated', never 'live'."""
+    return is_live_s4() and is_mock_mode()
+
+
 # --- Inbound identity (A2A boundary) ----------------------------------------
 # mock (IBD_TESTING) | ias (Joule A2A — IAS user token) | xsuaa (legacy/direct).
 # Joule delivers an IAS token, so AGENT_AUTH_MODE=ias is the Joule-integration path.
