@@ -20,9 +20,13 @@ from datetime import date
 
 import config
 
-# Fixed "today" for the demo so required dates sit in the near future and SLA /
-# prediction maths are reproducible across runs.
-DEMO_TODAY = date(2026, 10, 5)
+def today() -> date:
+    """Current system date, resolved live on every call.
+
+    All date arithmetic (overdue checks, days-to-required) resolves against the
+    real clock so assessments are always time-accurate against live SAP dates.
+    """
+    return date.today()
 
 # Phase-1 Excel project-schedule template (FSD §9.1). The agent reads these
 # columns; Phase 2 maps them onto SAP PS (PRPS / VORGN / RESB / AFVV).

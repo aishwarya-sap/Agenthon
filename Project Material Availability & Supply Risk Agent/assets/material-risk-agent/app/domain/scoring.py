@@ -101,6 +101,12 @@ def assess_material(activity: dict, stock: dict, orders: list[dict], gr_history:
     chronic = is_chronic_late(gr_history)
     band = elevate_for_pattern(base_band, chronic)
 
+    # Time-accuracy against the real current date (never hardcoded):
+    # days until the material is needed, and whether that date is already past.
+    from .data import today
+    days_to_required = (_d(required_date) - today()).days
+    overdue = days_to_required < 0
+
     return {
         "project_id": activity["project_id"],
         "activity_id": activity["activity_id"],
@@ -110,6 +116,8 @@ def assess_material(activity: dict, stock: dict, orders: list[dict], gr_history:
         "required_qty": required_qty,
         "uom": activity.get("uom", ""),
         "required_date": required_date,
+        "days_to_required": days_to_required,
+        "overdue": overdue,
         "float_days": float_days,
         "unrestricted_stock": unrestricted,
         "net_available_qty": net_avail,

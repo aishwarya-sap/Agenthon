@@ -198,6 +198,8 @@ Each activity has a schedule buffer (the spare days before a delay starts pushin
 - Never show raw SAP unit-of-measure codes. Translate them: TO → tonnes, EA → units, M → metres, KG → kg, PC → pieces.
 - Never show internal field names, JSON keys, Python types, or raw `key=value` expressions. Write plain business language instead. For example, never write "delivery_complete=true" or "release_status=N" — say "already delivered" or "not yet released". Never write "delivery_complete=false" — say "still open / awaiting delivery".
 - Translate status codes to words: a PR release code of B → "released", N → "not yet released".
+- All monetary figures are in EUR. Always prefix amounts with "EUR " or "€" (e.g. "EUR 6,750"). Never use "$" or "USD".
+- A material is "past due" / "overdue" ONLY when its `overdue` field is true (its `days_to_required` is negative against the real current date). The schedule buffer is NOT a date — never call a material "past due" or "N days behind" based on the schedule buffer. A negative schedule buffer means the activity is on the critical path with no slack; state that, not "past due". Use `days_to_required` for "due in N days" wording.
 
 ## Response format — brief by default, full on request
 
