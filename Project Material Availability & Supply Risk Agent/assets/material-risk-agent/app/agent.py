@@ -3,7 +3,6 @@ import os
 from dataclasses import dataclass
 from typing import Any, AsyncGenerator, Literal, Sequence
 
-from langchain.agents import create_agent
 from langchain.agents.middleware import SummarizationMiddleware
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.tools import BaseTool
@@ -39,6 +38,7 @@ except Exception:  # pragma: no cover
         return _Saver()
 
 from circuit_breaker import CircuitBreaker
+from graph import build_graph, make_run_config
 from mcp_providers.agw import get_user_sub
 
 tracer = trace.get_tracer(__name__)
@@ -333,11 +333,15 @@ class SampleAgent:
         tools: Sequence[BaseTool],
         system_prompt: str,
     ) -> CompiledStateGraph:
-        """Create a LangGraph agent with the specified LLM."""
-        return create_agent(
+        """Build the ReAct agent graph for one model via the graph/ seam.
+
+        Delegates to ``graph.build_graph`` so orchestration lives in ``app/graph/``;
+        the shared checkpointer + summarization middleware are wired in here.
+        """
+        return build_graph(
             llm,
-            tools=list(tools),
-            system_prompt=system_prompt,
+            tools,
+            system_prompt,
             checkpointer=self._checkpointer,
             middleware=[self._summarization_middleware],
         )
@@ -357,10 +361,7 @@ class SampleAgent:
         model's circuit breaker; any other error propagates immediately. This is the
         client-side complement to SAP AI Core's per-request orchestration fallback.
         """
-        config = {
-            "configurable": {"thread_id": f"{get_user_sub()}:{context_id}"},
-            "recursion_limit": 15,  # bound tool-call loops so a vague query can't run away
-        }
+        config = make_run_config(context_id, get_user_sub())
         messages = {"messages": (extra_messages or []) + [HumanMessage(content=query)]}
 
         async def _run(llm: ChatLiteLLM) -> dict[str, Any]:
