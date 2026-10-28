@@ -62,8 +62,8 @@ Perform commercial calculations to determine the cost-optimal processing path ba
 
 ---
 
-### 1.5 — GDH APAC Data and AI Architect Group Support
-Engage the central GDH APAC Data and AI Architect Group early to identify the architectural support needs for this project. Raise a callout to the region architect group covering: solution design review, AI platform guidance, integration architecture, and any escalation paths required for delivery. Architect group involvement must be confirmed before the build phase begins.
+### 1.5 — SAP BTP Data and AI Architect Group Support
+Engage the central SAP BTP Data and AI Architect Group early to identify the architectural support needs for this project. Raise a callout to the region architect group covering: solution design review, AI platform guidance, integration architecture, and any escalation paths required for delivery. Architect group involvement must be confirmed before the build phase begins.
 
 ---
 

@@ -1,6 +1,6 @@
 # Developer Hand-off — Project Material Availability & Supply Risk Agent
 
-**Repo:** `https://github.tools.sap/GDH-Data-AI-Architecture-APAC/Savic-Adarsh-Developers-Agenthon` · branch `main`
+**Repo:** `https://github.tools.sap/SAP-BTP/Savic-Adarsh-Developers-Agenthon` · branch `main`
 **Status:** Build complete — specs written, agent deployed to CF (us10) and healthy, 175 tests green (73% coverage), quality gate PASS, code review PASS. Joule registration + principal-propagation end-to-end test pending (tenant-side config). HANA-backed memory pending.
 **Checklist tracker:** `docs/agent-checklist-assessment.md` in this repo
 
@@ -34,7 +34,7 @@ Design decisions: LangChain/LangGraph · Single agent · Advisory-only + HITL ·
 | `docs/specs/design-brief.md` | Confirmed design decisions (D0–D12) |
 | `docs/specs/technical-specification.md` | As-built design: components, data model, real S/4 OData services + entities, security, deployment |
 | `docs/specs/rtm.md` | Requirements → implementation → test traceability (100%) |
-| `docs/checklists/agent-checklist-L0-L10.md` | GDH APAC Agent Checklist v5 (10-pillar / 60-item) |
+| `docs/checklists/agent-checklist-L0-L10.md` | agent build checklist |
 | `docs/agent-checklist-assessment.md` | Per-pillar readiness status for this agent |
 | `CODE_WALKTHROUGH.md` | Module map + request lifecycle |
 
@@ -107,4 +107,4 @@ Keep both `IBD_LIVE_S4=1` and `IBD_TESTING=1` set so the live-first fallback ser
 
 ## 6. Provenance
 
-Hand-built on the SAP Agent Golden Path A2A template (mock-first), aligned to the GDH AI Factory documentation standard (QG/CR checklists, `docs/specs/` layout). Kept the `app/` package layout and `python app/_boot.py` start (no `src/`/gunicorn migration) per engagement decision.
+Hand-built on the SAP Agent Golden Path A2A template (mock-first), aligned to the SAP BTP documentation standard (QG/CR checklists, `docs/specs/` layout). Kept the `app/` package layout and `python app/_boot.py` start (no `src/`/gunicorn migration) per engagement decision.

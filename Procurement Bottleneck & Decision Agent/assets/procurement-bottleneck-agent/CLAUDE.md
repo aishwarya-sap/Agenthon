@@ -1,6 +1,6 @@
 # CLAUDE.md — Procurement Bottleneck & Decision Agent
 
-Advisory, **read-only** SAP A2A agent (Adarsh Developers). Built to the GDH AI Factory standard.
+Advisory, **read-only** SAP A2A agent (Adarsh Developers). Built to the build standard.
 Full docs: repo-root `docs/` (specs, decisions/ADRs, checklists, HANDOFF).
 
 ## Architecture
@@ -26,6 +26,6 @@ gunicorn app.main:app -c gunicorn.conf.py   # production entry (CF Procfile)
 ```
 
 ## Governance
-Tracked against the GDH APAC Agent Checklist v5 (10-pillar / 60-item):
+Tracked against the agent build checklist:
 `docs/checklists/agent-checklist-L0-L10.md`; per-pillar status in `docs/agent-checklist-assessment.md`.
 Pillar numbering mirrors the `governance/*.md` artifacts. Decisions in `docs/decisions/`.

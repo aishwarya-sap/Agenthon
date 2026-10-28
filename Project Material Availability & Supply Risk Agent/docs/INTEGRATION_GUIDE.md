@@ -341,4 +341,4 @@ Use `Authentication: OAuth2SAMLBearerAssertion` in the BTP destination instead. 
 
 ---
 
-*Last updated: 2026-10-21 | Owner: GDH APAC Build Team*
+*Last updated: 2026-10-21 | Owner: SAP BTP Build Team*

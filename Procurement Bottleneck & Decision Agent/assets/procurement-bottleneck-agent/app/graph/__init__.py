@@ -1,4 +1,4 @@
-"""LangGraph orchestration package (GDH AI Factory standard seam).
+"""LangGraph orchestration package (build standard seam).
 
 The graph wraps the agent's existing deterministic turn so the repo matches the
 template's `build_graph()` structure (typed state, checkpointer, recursion limit)

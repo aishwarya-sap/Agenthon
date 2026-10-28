@@ -1,7 +1,7 @@
 # Master Reference — Project Material Availability & Supply Risk Agent
 
 **Project:** Savic + Adarsh Agenthon — Demo October 28, 2026  
-**Build owner:** GDH APAC Build Team  
+**Build owner:** SAP BTP Build Team  
 **Last updated:** 2026-10-21  
 **Status:** Built & verified locally. Pending CF deploy + Joule integration.
 
@@ -22,7 +22,7 @@
 11. [Joule integration steps](#11-joule-integration-steps)
 12. [Principal propagation to S/4](#12-principal-propagation-to-s4)
 13. [Environment variable reference](#13-environment-variable-reference)
-14. [Checklist status — GDH APAC 60 items](#14-checklist-status--gdh-apac-60-items)
+14. [Checklist status](#14-checklist-status)
 15. [What is pending from your side](#15-what-is-pending-from-your-side)
 
 ---
@@ -97,7 +97,7 @@ Project Material Availability & Supply Risk Agent/
 │   │   │   │   └── agw.py       # Tool provider: mock | live-S4 | Agent Gateway
 │   │   │   └── circuit_breaker.py  # LLM call circuit breaker (3 fails / 30s)
 │   │   ├── eval/                # RAG eval harness (rag_eval.py + gold set + scorecard)
-│   │   ├── governance/          # 9 governance docs mapped to GDH APAC checklist
+│   │   ├── governance/          # 9 governance docs mapped to SAP BTP checklist
 │   │   ├── tests/               # 154 pytest tests (all passing, 80% coverage)
 │   │   ├── asset.yaml           # Tool/ORD catalog for Agent Gateway
 │   │   ├── mcp-mock.json        # Declarative tool catalog (15 tools, 3 servers)
@@ -428,7 +428,7 @@ See `docs/INTEGRATION_GUIDE.md` Part 4 for full detail.
 
 ---
 
-## 14. Checklist status — GDH APAC 60 items
+## 14. Checklist status
 
 Full detail in `assets/material-risk-agent/agent-outcome-report.md`.
 

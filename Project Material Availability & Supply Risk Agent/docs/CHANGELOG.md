@@ -6,7 +6,7 @@ All notable changes to this agent are documented here. Format based on [Keep a C
 
 ### Added
 - Full spec set under `docs/specs/` (design-brief, functional-specification, technical-specification, rtm) and ADRs under `docs/decisions/`.
-- Quality Gate (QG-) and Code Review (CR-) reports under `docs/`, aligned to the GDH AI Factory checklists.
+- Quality Gate (QG-) and Code Review (CR-) reports under `docs/`, aligned to the SAP BTP checklists.
 - Live-first fallback: a failed live S/4 read serves seeded data tagged `signal_status=simulated` when both `IBD_LIVE_S4` and `IBD_TESTING` are set.
 - `.cfignore` in the agent folder to exclude `.venv` from the CF droplet.
 - Standalone Node/Express chat UI with dynamic `[SUGGESTIONS]` follow-up chips and a single attachment control.
@@ -15,7 +15,7 @@ All notable changes to this agent are documented here. Format based on [Keep a C
 - Response is brief-by-default (headline + table) and expands only on request; tabular multi-material output; no technical/data-source names in user-facing text.
 - Risk/date accuracy: `days_to_required`/`overdue` computed against the real current date; removed the hardcoded demo date.
 - Monetary figures standardized to EUR in user-facing output.
-- Documentation restructured to the GDH AI Factory layout; L0-1..L0-10 checklist replaced with QG/CR checklists.
+- Documentation restructured to the SAP BTP layout; L0-1..L0-10 checklist replaced with QG/CR checklists.
 
 ### Fixed
 - A2A agent-card endpoint migrated to `/.well-known/agent-card.json`.

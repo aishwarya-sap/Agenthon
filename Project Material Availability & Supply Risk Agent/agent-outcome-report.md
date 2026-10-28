@@ -1,7 +1,7 @@
 # Agent Outcome Report — Production Readiness
 
 **Agent:** material-risk-agent — *Project Material Risk — Construction Activity Impact Agent*
-**Checklist:** GDH APAC AI Agent Checklist (10 pillars, 60 L1 items)
+**Checklist:** SAP BTP AI Agent Checklist (10 pillars, 60 L1 items)
 **Date:** 2026-10-20
 **Verdict:** **CONDITIONAL GO** — go for demo / Agenthon; tenant-only items gate production.
 
@@ -32,7 +32,7 @@ Status legend: ✅ Satisfied · ⚠️ Partial (documented/interim; tenant final
 | 1.2 | Commercial Tier Determination | ✅ | Tier proposed; confirm against LLM Calculator (4.1) |
 | 1.3 | AI Golden Path | ✅ | On path; 6.1/6.2 deviation logged as exception |
 | 1.4 | Document - AI Commercialization Tracker | ⏭️ | No per-page Document AI processing in scope |
-| 1.5 | GDH APAC Architect Group Support | ✅ | Architecture review engaged |
+| 1.5 | SAP BTP Architect Group Support | ✅ | Architecture review engaged |
 
 ### L0-2 · LLM Selection & Benchmarking
 | Item | Name | Status | Note |

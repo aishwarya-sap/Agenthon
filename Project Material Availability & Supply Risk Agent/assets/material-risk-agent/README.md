@@ -83,4 +83,4 @@ Full checklist status: see `agent-outcome-report.md` and `governance/`.
 
 ---
 
-*Built on SAP LastMileSupport Joule 2.0 A2A template. GDH APAC — October 2026.*
+*Built on SAP LastMileSupport Joule 2.0 A2A template. SAP BTP — October 2026.*

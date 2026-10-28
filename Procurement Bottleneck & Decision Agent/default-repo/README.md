@@ -12,7 +12,7 @@ default-repo/
 ├── assets/agent-starter-kit/         ← Python A2A agent (rename to your agent name)
 ├── assets/agent-starter-kit-ui/      ← Joule-style chat UI
 ├── governance/
-│   ├── agent_checklist_L0_to_L10.md   ← 10-pillar 60-item governance checklist
+│   ├── agent_checklist_L0_to_L10.md   ← governance checklist
 │   └── sprint_checklist_stage0_to_8.md ← Engineering build checklist
 ├── docs/
 │   ├── data_readiness_questionnaire.md
@@ -97,7 +97,7 @@ Review the [Engineering Checklist](governance/sprint_checklist_stage0_to_8.md) b
 
 ## Cookbook reference
 
-This scaffold follows the **SAP Agent-PathToProd / Custom-Agentic-Solutions-CoE** cookbook.
+This scaffold follows the **SAP  / Custom-Agentic-Solutions-CoE** cookbook.
 Mandatory rules enforced:
 - Exactly 3 `@agent_*` decorators in `agent.py`
 - 6 MANDATORY RULES in every system prompt (incl. `top=100` and financial disclaimer)

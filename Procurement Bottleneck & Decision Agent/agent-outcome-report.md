@@ -1,9 +1,9 @@
 # Agent Outcome Report — Procurement Bottleneck & Decision Agent
-Generated: 2026-10-13 · Scored against GDH APAC Agent Checklist v5 (10-pillar / 60-item): 2026-10-27
+Generated: 2026-10-13 · Scored against agent build checklist: 2026-10-27
 Build scope: full custom agent (advisory, read-only)
 
 > **Governance note (2026-10-27):** production readiness is tracked against the authoritative
-> **GDH APAC Agent Checklist v5** — the 10-pillar (L0-1 … L0-10), 60-item model. Checklist:
+> **agent build checklist** — Checklist:
 > `docs/checklists/agent-checklist-L0-L10.md`; per-pillar assessment for this agent:
 > `docs/agent-checklist-assessment.md`. The pillar numbering is also reflected in the agent's
 > `assets/procurement-bottleneck-agent/governance/` artifacts (e.g. `2.6`, `5.3`, `10.2`).
@@ -15,7 +15,7 @@ Build scope: full custom agent (advisory, read-only)
   active projects, quantifies the downstream consequence, recalls similar past decisions, and
   recommends an action for Purchasing-HoD approval; every outcome captured as institutional memory.
 - **Type:** deterministic tool/skill orchestration core + bounded LLM reasoning (not a LangGraph graph).
-- **Build path:** pro-code (hand-built to the GDH AI Factory standard).
+- **Build path:** pro-code (hand-built to the build standard).
 - **Runtime:** Starlette + A2A 0.3.0 on Cloud Foundry (us10); LLM via SAP AI Core (ChatLiteLLM).
 - **Grounding:** S/4 OData (BAH sandbox) + RAG (HANA Vector, design) + institutional memory;
   project data via SAP PS or Excel/CSV.

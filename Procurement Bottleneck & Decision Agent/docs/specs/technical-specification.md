@@ -3,7 +3,7 @@
 ## Executive Summary
 
 ### Document Metadata
-Advisory, read-only SAP A2A agent on BTP Cloud Foundry. Hand-built to the GDH AI Factory standard.
+Advisory, read-only SAP A2A agent on BTP Cloud Foundry. Hand-built to the build standard.
 
 ### Version History
 See `docs/CHANGELOG.md`.

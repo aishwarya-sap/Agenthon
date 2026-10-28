@@ -50,7 +50,7 @@ def get_agent_card(base_url: str) -> dict[str, Any]:
         "capabilities": {"streaming": False, "push_notifications": False},
         "skills": [SKILL],
         "supported_interfaces": [],
-        "provider": {"organization": "Adarsh Developers (SAP GDH APAC)", "url": base_url},
+        "provider": {"organization": "Adarsh Developers (SAP SAP BTP)", "url": base_url},
     }
 
 

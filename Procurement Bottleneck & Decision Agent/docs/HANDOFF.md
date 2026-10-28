@@ -53,6 +53,6 @@ procurement-bottleneck-agent IBD_TESTING 0 && cf restart procurement-bottleneck-
 
 ## 6. Provenance
 
-Hand-built to the SAP GDH AI Factory standard (not copier-generated). Production readiness is tracked
-against the authoritative **GDH APAC Agent Checklist v5** (10-pillar / 60-item):
+Hand-built to the SAP build standard (not copier-generated). Production readiness is tracked
+against the authoritative **agent build checklist** :
 `docs/checklists/agent-checklist-L0-L10.md` — per-pillar status in `docs/agent-checklist-assessment.md`.

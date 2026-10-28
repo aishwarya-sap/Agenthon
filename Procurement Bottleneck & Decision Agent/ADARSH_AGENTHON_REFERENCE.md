@@ -2,7 +2,7 @@
 
 > Single reference for the engagement: what's built, how Joule + principal propagation
 > work, first-timer BTP enablement steps, the BAI end-to-end test with the SAP Business
-> Accelerator Hub, test/demo workflows, and the GDH APAC checklist status with what's
+> Accelerator Hub, test/demo workflows, and the SAP BTP checklist status with what's
 > pending. Last updated 2026-10-21.
 >
 > **Secrets rule:** no API keys, passwords, or client secrets live in this file or the
@@ -244,9 +244,9 @@ Clean history, no secrets (scan), `.env.example` only, README + run/deploy, all 
 
 ---
 
-## 9. GDH APAC Agent Checklist (v5, 60 items) — status & pending
+## 9. agent build checklist (v5, 60 items) — status & pending
 
-Source: `/Users/I778959/Documents/SAP VsCode/architecture_engineering_portal/GDHAPACAIAgentChecklist-main/Agent_Checklist_Master_List_v5.md`.
+Source: `/Users/I778959/Documents/SAP VsCode/architecture_engineering_portal/SAP BTPAIAgentChecklist-main/Agent_Checklist_Master_List_v5.md`.
 **Status (2026-10-17 pass): 23 ✅ / 20 ⚠️ / 7 ❌ / 10 ⏭️.** Full detail in `assets/procurement-bottleneck-agent/agent-outcome-report.md` + `governance/`.
 
 **The 7 ❌ are tenant-only (cannot close offline):**

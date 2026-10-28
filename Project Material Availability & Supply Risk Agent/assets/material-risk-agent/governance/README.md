@@ -1,6 +1,6 @@
 # Governance Artifacts — Index
 
-Deliverables produced to close the offline-completable portion of the GDH APAC AI
+Deliverables produced to close the offline-completable portion of the SAP BTP AI
 Agent Checklist (v5) for `material-risk-agent`. Each maps to a checklist item.
 Items requiring the live BTP tenant or a human governance sign-off are marked
 accordingly — they are **not** code defects.

@@ -1,6 +1,6 @@
 # Agent Checklist Assessment — Procurement Bottleneck & Decision Agent
 
-Scored against the authoritative **GDH APAC Agent Checklist (v5)** — the 10-pillar / 60-item model in
+Scored against the authoritative **agent build checklist (v5)** — the  model in
 [`docs/checklists/agent-checklist-L0-L10.md`](checklists/agent-checklist-L0-L10.md). Honest status;
 evidence points to the real artifacts in `assets/procurement-bottleneck-agent/governance/`, the test
 suite, and the code.

@@ -3,7 +3,7 @@
 ## 1. Document Organization
 
 ### 1.1 Document Log
-Hand-authored to the SAP GDH AI Factory standard. Maintained alongside the code in `docs/specs/`.
+Hand-authored to the SAP build standard. Maintained alongside the code in `docs/specs/`.
 
 ### 1.2 References
 - `docs/specs/design-brief.md`, `docs/specs/technical-specification.md`, `docs/specs/rtm.md`

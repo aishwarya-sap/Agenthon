@@ -12,7 +12,7 @@
 |---|---|
 | BTP subaccount for Adarsh | Confirm subaccount ID and region (must be us10 to match CF apps) |
 | CF space for agents | Create space `PROD` (or `STAGING`) in the subaccount |
-| CF org developer role | Grant `aishwarya.sharma01@sap.com` SpaceDeveloper + OrgManager |
+| CF org developer role | Grant `<sap-team>` SpaceDeveloper + OrgManager |
 | AI Core service instance | `cf create-service aicore …` or confirm existing instance |
 
 ### 2. SAP AI Core credentials

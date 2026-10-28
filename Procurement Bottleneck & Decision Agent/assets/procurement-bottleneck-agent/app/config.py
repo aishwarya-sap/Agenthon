@@ -166,7 +166,7 @@ def emergency_premium_pct(material_category: str | None) -> float:
     return EMERGENCY_SOURCING_PREMIUM_PCT.get(key, EMERGENCY_SOURCING_PREMIUM_PCT["DEFAULT"])
 
 
-# --- Grouped typed settings (GDH AI Factory standard surface) ---------------
+# --- Grouped typed settings (build standard surface) ---------------
 # A typed, grouped accessor over the same env vars as the module constants above,
 # with an AGENT_ env prefix and a get_settings() singleton (the shape the template
 # expects). Callers migrate from the constants to get_settings() incrementally — the

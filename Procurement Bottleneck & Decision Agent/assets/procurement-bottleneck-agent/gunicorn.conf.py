@@ -1,6 +1,6 @@
 """Gunicorn configuration for the Procurement Bottleneck & Decision Agent on Cloud Foundry.
 
-Production entry point (matches the GDH AI Factory reference): gunicorn with a Uvicorn
+Production entry point (matches the SAP BTP reference): gunicorn with a Uvicorn
 ASGI worker, fronting the Starlette A2A app built in ``app/main.py`` (module-level ``app``).
 
 WEB_CONCURRENCY defaults to 1: the agent keeps per-context HITL approval state and the
