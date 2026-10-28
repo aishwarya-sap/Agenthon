@@ -1,19 +1,14 @@
 #!/usr/bin/env bash
 # deploy.sh — push both apps to Cloud Foundry
 # Usage: ./deploy.sh
-# Or:    CF_APP_DOMAIN=cfapps.ap20.hana.ondemand.com ./deploy.sh
+# Or:    CF_APP_DOMAIN=cfapps.<region>.hana.ondemand.com ./deploy.sh
 
 set -euo pipefail
 
 # ── CF domain ─────────────────────────────────────────────────────────────────
 if [[ -z "${CF_APP_DOMAIN:-}" ]]; then
   echo ""
-  echo "Enter your CF app domain (e.g. cfapps.us10-001.hana.ondemand.com):"
-  echo "  us10 (US East):        cfapps.us10-001.hana.ondemand.com"
-  echo "  eu10 (EU West):        cfapps.eu10.hana.ondemand.com"
-  echo "  ap10 (Australia):      cfapps.ap10.hana.ondemand.com"
-  echo "  ap20 (Singapore/SEA):  cfapps.ap20.hana.ondemand.com"
-  echo "  ap21 (Singapore):      cfapps.ap21.hana.ondemand.com"
+  echo "Enter your CF app domain (e.g. cfapps.<region>.hana.ondemand.com):"
   echo ""
   read -rp "CF_APP_DOMAIN: " CF_APP_DOMAIN
 fi

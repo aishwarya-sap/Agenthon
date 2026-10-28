@@ -78,7 +78,7 @@ Track which checklist items are done per sprint. Update at end of each sprint re
 
 | Milestone | Date | Status |
 |-----------|------|--------|
-| Agenthon Demo (BAI internal) | 2026-10-26 | ⏳ |
+| Agenthon | 2026-10-26 | ⏳ |
 | Sprint 1 delivery to Adarsh | TBC | ⏳ |
 | Sprint 2 completion | TBC | ⏳ |
 | Sprint 3 completion | TBC | ⏳ |

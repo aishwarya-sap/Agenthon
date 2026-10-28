@@ -2,7 +2,7 @@
 
 **Repo:** `https://github.tools.sap/GDH-Data-AI-Architecture-APAC/Savic-Adarsh-Developers-Agenthon` · branch `main`
 **Status:** Build complete — specs written, agent deployed to CF (us10) and healthy, 175 tests green (73% coverage), quality gate PASS, code review PASS. Joule registration + principal-propagation end-to-end test pending (tenant-side config). HANA-backed memory pending.
-**Checklist tracker:** https://agentchecklist.cfapps.us10-001.hana.ondemand.com/
+**Checklist tracker:** `docs/agent-checklist-assessment.md` in this repo
 
 ---
 
@@ -98,7 +98,7 @@ cf push material-risk-agent
 cf push material-risk-ui
 
 # Verify
-curl https://material-risk-agent.cfapps.us10-001.hana.ondemand.com/.well-known/agent-card.json
+curl https://material-risk-agent.cfapps.<region>.hana.ondemand.com/.well-known/agent-card.json
 ```
 
 Keep both `IBD_LIVE_S4=1` and `IBD_TESTING=1` set so the live-first fallback serves seeded data if the shared sandbox is down.

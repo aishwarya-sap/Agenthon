@@ -7,7 +7,6 @@
 ---
 
 > **Link key**
-> Links prefixed `ekg.cloud.sap` are SAP Knowledge Graph URIs — primary source of truth.
 > Links prefixed `idea-agent` are the provided Idea2Value tool URL.
 > All other links are SAP Help Portal, SAP API Business Hub, or SAP Trust Centre.
 
@@ -32,8 +31,6 @@ Converts an unstructured agentic AI idea into a CXO-ready business value case th
 | **TRUST** | Responsible AI alignment, regulatory risk, and governance requirements |
 
 Each stage gate requires documented evidence before the case advances. The completed Idea2Value document is the primary traceability record consumed by ESCE sign-off (1.5).
-
-> **References:** [Idea2Value Tool](https://idea-agent.cfapps.us10-001.hana.ondemand.com/) · [ESCE Term](https://ekg.cloud.sap/SAP/LX/TM/TRM/ESCE5CF3FCDB46F61EE7A8859EFC21919645)
 
 ---
 
@@ -68,8 +65,6 @@ Perform commercial calculations to determine the cost-optimal processing path ba
 ### 1.5 — GDH APAC Data and AI Architect Group Support
 Engage the central GDH APAC Data and AI Architect Group early to identify the architectural support needs for this project. Raise a callout to the region architect group covering: solution design review, AI platform guidance, integration architecture, and any escalation paths required for delivery. Architect group involvement must be confirmed before the build phase begins.
 
-> **References:** [ESCE Term](https://ekg.cloud.sap/SAP/LX/TM/TRM/ESCE5CF3FCDB46F61EE7A8859EFC21919645)
-
 ---
 
 ## L0-2 · LLM Selection & Benchmarking
@@ -87,7 +82,7 @@ Curate a representative evaluation dataset covering the agent's intended use cas
 ### 2.2 — Automated Multi-Model Evaluation
 Run the approved test dataset against all candidate models via the Benchmarking Agent to produce objective, comparable quality and latency scores. Evaluation covers accuracy, token efficiency, latency, and safety. Results are recorded in the Internal Evaluation Dashboard (2.4) and form the evidence base for the Frontier Model Justification Gate (2.6).
 
-> **References:** [AI Core API](https://ekg.cloud.sap/SAP/BAH/SAPIH/RAP/AICoreAI_CORE_API) · [Generative AI Hub](https://www.sap.com/products/artificial-intelligence/generative-ai-hub.html)
+> **References:** [Generative AI Hub](https://www.sap.com/products/artificial-intelligence/generative-ai-hub.html)
 
 ---
 
@@ -133,14 +128,10 @@ For each fully agentic decision step, document why a frontier model is required 
 ### 3.1 — Document Grounding Setup
 Connect the agent to enterprise document repositories via the SAP Document Grounding API, configuring chunking strategy, metadata tagging, and access-control filters. Grounding scope determines which documents are available at inference time and must be validated against the RAG Evaluation Scorecard (3.3) before production. Only documents covered by data governance approval (5.7) may be indexed; any out-of-scope document is an indirect injection risk (5.6).
 
-> **References:** [Document Grounding API](https://ekg.cloud.sap/SAP/BAH/SAPIH/RAP/GroundingDOCUMENT_GROUNDING_API)
-
 ---
 
 ### 3.2 — Vector Embedding & Retrieval Pipeline
 Select the embedding model, configure vector store dimensions, and validate retrieval precision and recall on the evaluation dataset. SAP HANA Cloud Vector Engine is the SAP-native vector store providing enterprise-grade security and tenant isolation. Pipeline parameters (chunk size, overlap, top-k) must be documented, version-controlled alongside prompt templates, and re-validated after any parameter change.
-
-> **References:** [Document Grounding API](https://ekg.cloud.sap/SAP/BAH/SAPIH/RAP/GroundingDOCUMENT_GROUNDING_API)
 
 ---
 
@@ -161,7 +152,7 @@ The consolidated quality gate for a grounded agent: eight metrics across two fam
 
 RagEval, a RAG evaluation tool, produces the full scorecard: groundedness and context relevance need no gold set, while answer correctness, answer similarity, and context recall are scored against a curated gold set of questions and answers — so gold-set quality drives how trustworthy the scores are.
 
-> **References:** [Document Grounding API](https://ekg.cloud.sap/SAP/BAH/SAPIH/RAP/GroundingDOCUMENT_GROUNDING_API) · [Responsible AI](https://www.sap.com/india/products/artificial-intelligence/ai-ethics.html) · [Generative AI Hub](https://www.sap.com/products/artificial-intelligence/generative-ai-hub.html) · [RagEval](https://rageval-service.cfapps.us10-001.hana.ondemand.com/ui#compare)
+> **References:** [Responsible AI](https://www.sap.com/india/products/artificial-intelligence/ai-ethics.html) · [Generative AI Hub](https://www.sap.com/products/artificial-intelligence/generative-ai-hub.html)
 
 ---
 
@@ -181,7 +172,7 @@ The forward plan for SAP's document grounding automation capabilities, covering 
 
 ### 3.6 — Runtime Hallucination Guardrail ArchitectureDefine and implement the output validation layer including grounding confidence threshold, automatic answer rejection below the threshold, and customer-visible citation or grounding indicators on AI responses. Architecture specification must include: scoring method, rejection threshold value, user-facing fallback message format, the monitoring dashboard where hallucination rate is tracked continuously in production, and the alert threshold that triggers incident response.
 
-> **References:** [Document Grounding API](https://ekg.cloud.sap/SAP/BAH/SAPIH/RAP/GroundingDOCUMENT_GROUNDING_API) · [Responsible AI](https://www.sap.com/india/products/artificial-intelligence/ai-ethics.html)
+> **References:** [Responsible AI](https://www.sap.com/india/products/artificial-intelligence/ai-ethics.html)
 
 ---
 
@@ -200,7 +191,7 @@ SAP's internal pricing tool that estimates the LLM cost component of an AI featu
 ### 4.2 — AI Scenario Metering Integration
 Integrate the AI feature with SAP's central metering infrastructure so every LLM call, agent invocation, and tool execution is captured and attributed to the correct tenant, scenario, and commercial SKU. Metering must be validated end-to-end in the test environment before go-live, with billing records verified against actual API call logs. Metering gaps post go-live cause revenue leakage and contractual risk; post-launch metering failures are a P1 commercial incident.
 
-> **References:** [AI Core API](https://ekg.cloud.sap/SAP/BAH/SAPIH/RAP/AICoreAI_CORE_API) · [SAP AI Core Pricing](https://discovery-center.cloud.sap/serviceCatalog/sap-ai-core/?region=all&tab=service_plan&commercialModel=payg) · [SAP Business AI Pricing Model (video)](https://www.sap.com/products/artificial-intelligence/ai-units.html)
+> **References:** [SAP AI Core Pricing](https://discovery-center.cloud.sap/serviceCatalog/sap-ai-core/?region=all&tab=service_plan&commercialModel=payg) · [SAP Business AI Pricing Model (video)](https://www.sap.com/products/artificial-intelligence/ai-units.html)
 
 ---
 
@@ -226,7 +217,7 @@ SAP's consumption-based pricing model for Business AI features, where customers 
 
 ### 4.6 — Cost Per Transaction BaselineDefine and instrument cost per agent invocation across LLM calls, tool calls, and retrieval operations, then establish ceiling thresholds before go-live. Baseline is recorded as part of the go-live checklist and reviewed quarterly. Any cost per transaction exceeding the ceiling triggers a cost review before the next model or tool change is applied. Connected to AI Scenario Metering Integration (4.2) for raw cost data and Customer Token Consumption Forecast (4.5) for customer-facing estimates.
 
-> **References:** [AI Core API](https://ekg.cloud.sap/SAP/BAH/SAPIH/RAP/AICoreAI_CORE_API) · [SAP AI Core Pricing](https://discovery-center.cloud.sap/serviceCatalog/sap-ai-core/?region=all&tab=service_plan&commercialModel=payg) · [SAP Business AI Pricing Model (video)](https://www.sap.com/products/artificial-intelligence/ai-units.html)
+> **References:** [SAP AI Core Pricing](https://discovery-center.cloud.sap/serviceCatalog/sap-ai-core/?region=all&tab=service_plan&commercialModel=payg) · [SAP Business AI Pricing Model (video)](https://www.sap.com/products/artificial-intelligence/ai-units.html)
 
 ---
 
@@ -238,13 +229,13 @@ SAP's consumption-based pricing model for Business AI features, where customers 
 ### 5.1 — Responsible AI Pre-Release Evaluation
 Before release, evaluate the AI feature's model and prompt configuration against SAP's Responsible AI standards — covering harm detection, content safety, bias screening, and regulatory requirement alignment. This evaluation is a hard gate: features that do not pass cannot proceed to the cross-functional sign-off (7.4). Results are archived and referenced during GDPR / EU AI Act compliance review (5.5).
 
-> **References:** [Responsible AI](https://www.sap.com/india/products/artificial-intelligence/ai-ethics.html) · [Responsible AI Video](https://ekg.cloud.sap/SAP/MXP/CM/PV/ResponsibleAIFromSAPAIBuiltOnLeadingEthicsAndPrivacyStandards)
+> **References:** [Responsible AI](https://www.sap.com/india/products/artificial-intelligence/ai-ethics.html)
 
 ---
 
 ### 5.2 — AI Bias & Fairness AssessmentEvaluate outputs for demographic bias and fairness gaps using a defined measurement framework (e.g., demographic parity, equalized odds), with explicit acceptance thresholds and a required output report including a customer-facing disclosure. Post-release re-evaluation cadence must be no less frequent than every six months or following any model change. Assessment report must state measurement framework selection rationale, demographic categories evaluated, metric values against each threshold, and pass/fail determination.
 
-> **References:** [Responsible AI](https://www.sap.com/india/products/artificial-intelligence/ai-ethics.html) · [Responsible AI Video](https://ekg.cloud.sap/SAP/MXP/CM/PV/ResponsibleAIFromSAPAIBuiltOnLeadingEthicsAndPrivacyStandards) · [Responsible AI Compliance Video](https://ekg.cloud.sap/SAP/MXP/CM/PV/ResponsibleAIVideoSeriesCompliance)
+> **References:** [Responsible AI](https://www.sap.com/india/products/artificial-intelligence/ai-ethics.html)
 
 ---
 
@@ -258,26 +249,26 @@ Execute structured adversarial testing covering direct prompt injection (via use
 ### 5.4 — AI Ethics & Governance Alignment
 Confirm alignment with SAP's AI Ethics guidelines covering transparency, explainability, human oversight, and prohibition of specific high-risk use cases. Ethics review requires sign-off from the Responsible AI governance function — not only the product team — and must document how the agent communicates its AI nature to end users and what explanation is available for consequential decisions. Undisclosed AI agency in high-stakes business contexts is a compliance failure.
 
-> **References:** [Responsible AI](https://www.sap.com/india/products/artificial-intelligence/ai-ethics.html) · [Responsible AI Compliance Video](https://ekg.cloud.sap/SAP/MXP/CM/PV/ResponsibleAIVideoSeriesCompliance)
+> **References:** [Responsible AI](https://www.sap.com/india/products/artificial-intelligence/ai-ethics.html)
 
 ---
 
 ### 5.5 — GDPR / EU AI Act Compliance
 Confirm compliance with GDPR data processing obligations and, where applicable, EU AI Act requirements including risk classification, technical documentation, conformity assessment, and human oversight obligations. For high-risk AI systems, a conformity assessment and CE marking process applies. Documentation must state which regulatory category applies to the agent and what evidence satisfies each requirement; this record is reviewed during the cross-functional sign-off (7.4).
 
-> **References:** [Responsible AI](https://www.sap.com/india/products/artificial-intelligence/ai-ethics.html) · [Responsible AI Compliance Video](https://ekg.cloud.sap/SAP/MXP/CM/PV/ResponsibleAIVideoSeriesCompliance) · [ESCE Term](https://ekg.cloud.sap/SAP/LX/TM/TRM/ESCE5CF3FCDB46F61EE7A8859EFC21919645)
+> **References:** [Responsible AI](https://www.sap.com/india/products/artificial-intelligence/ai-ethics.html)
 
 ---
 
 ### 5.6 — Indirect Prompt Injection via Business DataAdversarial scanning of the RAG corpus and all connected business data sources (CRM records, supplier documents, procurement data, HR records) for injected instructions — distinct from direct prompt injection via user input (5.3), which is the primary attack surface in SAP's connected agent context. Sanitisation gate requires: automated scan for embedded instruction patterns, human review queue for ambiguous findings, and documented rejection or sanitisation of flagged records. Gate must be re-executed whenever new data sources are added to the retrieval pipeline.
 
-> **References:** [Document Grounding API](https://ekg.cloud.sap/SAP/BAH/SAPIH/RAP/GroundingDOCUMENT_GROUNDING_API) · [Adversarial Attack Term](https://learning.sap.com/courses/architecting-security-for-sap-business-technology-platform/differentiating-ai-vulnerabilities-and-attack-vectors) · [Responsible AI](https://www.sap.com/india/products/artificial-intelligence/ai-ethics.html)
+> **References:** [Adversarial Attack Term](https://learning.sap.com/courses/architecting-security-for-sap-business-technology-platform/differentiating-ai-vulnerabilities-and-attack-vectors) · [Responsible AI](https://www.sap.com/india/products/artificial-intelligence/ai-ethics.html)
 
 ---
 
 ### 5.7 — IP Rights & Data Ownership GovernanceDeclare output ownership position (customer, SAP, or shared), document customer data isolation at tenant level, confirm non-use of customer data in any model training step, state the copyright position for AI-generated content, and document SAP's indemnification position if AI output infringes third-party IP. IP governance record must be a distinct artefact — not embedded in a broader privacy policy — and must be updated whenever the foundational model or fine-tuning approach changes. Escalation path for customer disputes over output ownership must be defined.
 
-> **References:** [Responsible AI](https://www.sap.com/india/products/artificial-intelligence/ai-ethics.html) · [Responsible AI Compliance Video](https://ekg.cloud.sap/SAP/MXP/CM/PV/ResponsibleAIVideoSeriesCompliance)
+> **References:** [Responsible AI](https://www.sap.com/india/products/artificial-intelligence/ai-ethics.html)
 
 ---
 
@@ -289,7 +280,7 @@ Confirm compliance with GDPR data processing obligations and, where applicable, 
 ### 6.1 — Agent Builder in Joule Studio
 SAP's low-code tool within Joule Studio for configuring, testing, and registering AI agents against the SAP agent framework, providing the runtime execution environment, tool registration interface, and prompt management UI. All agents destined for SAP products must be registered and validated via Agent Builder before they are eligible for the release gate. Custom agents built outside Agent Builder require a documented exception and additional security review.
 
-> **References:** [Agent Builder](https://www.sap.com/products/financial-management/joule-studio-agent-builder.html) · [Joule Studio Product](https://www.sap.com/products/artificial-intelligence/joule-studio.html) · [Joule Studio PRF](https://ekg.cloud.sap/SAP/KMM/SCS/PRF/JouleStudio)
+> **References:** [Agent Builder](https://www.sap.com/products/financial-management/joule-studio-agent-builder.html) · [Joule Studio Product](https://www.sap.com/products/artificial-intelligence/joule-studio.html)
 
 ---
 
@@ -303,32 +294,32 @@ Joule Studio's Skill Builder enables product teams to define, test, and publish 
 ### 6.3 — Generative AI Hub (J17)
 SAP's managed LLM access layer (Joule feature J17) providing a unified API endpoint for model inference, prompt playground, token consumption tracking, and model version management. All LLM calls from SAP agents must route through the Generative AI Hub to ensure centralised access control, audit logging, and cost metering. The Hub also provides model lifecycle management including deprecation notices and version pinning against unplanned provider-side changes.
 
-> **References:** [Generative AI Hub](https://www.sap.com/products/artificial-intelligence/generative-ai-hub.html) · [AI Core API](https://ekg.cloud.sap/SAP/BAH/SAPIH/RAP/AICoreAI_CORE_API) · [SAP AI Core Pricing](https://discovery-center.cloud.sap/serviceCatalog/sap-ai-core/?region=all&tab=service_plan&commercialModel=payg)
+> **References:** [Generative AI Hub](https://www.sap.com/products/artificial-intelligence/generative-ai-hub.html) · [SAP AI Core Pricing](https://discovery-center.cloud.sap/serviceCatalog/sap-ai-core/?region=all&tab=service_plan&commercialModel=payg)
 
 ---
 
 ### 6.4 — SAP AI Core & AI Launchpad
 SAP AI Core is the runtime infrastructure for serving AI models, managing training pipelines, and executing agentic workloads at scale within the SAP BTP ecosystem; SAP AI Launchpad is the operations interface providing model deployment management, resource monitoring, and lifecycle orchestration. Together they form the foundational infrastructure layer on which all SAP-hosted agents run; production deployments must use AI Core as the serving runtime unless an approved exception is documented.
 
-> **References:** [AI Core API](https://ekg.cloud.sap/SAP/BAH/SAPIH/RAP/AICoreAI_CORE_API) · [SAP AI Core Pricing](https://discovery-center.cloud.sap/serviceCatalog/sap-ai-core/?region=all&tab=service_plan&commercialModel=payg) · [AI Launchpad](https://www.sap.com/india/products/artificial-intelligence/ai-launchpad.html) · [AI Launchpad (Help)](https://learning.sap.com/courses/introduction-to-ai-core/configuring-sap-ai-core-and-sap-ai-launchpad_a51c5214-d9ab-4f22-bc81-b683d09697fc)
+> **References:** [SAP AI Core Pricing](https://discovery-center.cloud.sap/serviceCatalog/sap-ai-core/?region=all&tab=service_plan&commercialModel=payg) · [AI Launchpad](https://www.sap.com/india/products/artificial-intelligence/ai-launchpad.html) · [AI Launchpad (Help)](https://learning.sap.com/courses/introduction-to-ai-core/configuring-sap-ai-core-and-sap-ai-launchpad_a51c5214-d9ab-4f22-bc81-b683d09697fc)
 
 ---
 
 ### 6.5 — Agent Tool Access GovernanceDefine RBAC for all agent tool invocations, establish customer-controlled per-tenant policy for which tools an agent may call, apply least-privilege scope, and implement an approval workflow for granting new or sensitive system access. The governance artefact must enumerate every callable tool, the minimum required permission scope, available tenant administrator controls, and the audit log schema with retention period. Segregation of duties must be explicitly documented for agents with write access to financial, procurement, or HR systems.
 
-> **References:** [RBAC Concept](https://ekg.cloud.sap/SAP/LX/TM/CPT/RoleBasedAccessControl42010AEF0E491EECB388711182364F45) · [Skills Governance Agent (J2259)](https://learning.sap.com/courses/exploring-joule-and-ai-agents-in-sap-successfactors/introducing-skills-assistants-and-agents_ad8e62d6-372b-4ba4-ad74-152130786666) · [AI Core API](https://ekg.cloud.sap/SAP/BAH/SAPIH/RAP/AICoreAI_CORE_API)
+> **References:** [Skills Governance Agent (J2259)](https://learning.sap.com/courses/exploring-joule-and-ai-agents-in-sap-successfactors/introducing-skills-assistants-and-agents_ad8e62d6-372b-4ba4-ad74-152130786666)
 
 ---
 
 ### 6.6 — Human-in-the-Loop Approval GovernanceTreats the approval pattern itself as a governance item: defines which agent actions need mandatory human sign-off versus which can run autonomously, how overrides are audited, and how the approval workflow is validated at release. The governance document must provide an explicit action classification table — each action categorised as fully autonomous, advisory, or blocked pending approval. Override events must be logged with approver identity, timestamp, and reason; the approval workflow is integration-tested as part of the release gate.
 
-> **References:** [Human-in-the-Loop Term](https://ekg.cloud.sap/SAP/LX/TM/TRM/HumanInTheLoop42010AEF4E231FD0B1BF8B43444361B3) · [Agent Builder](https://www.sap.com/products/financial-management/joule-studio-agent-builder.html) · [Responsible AI](https://www.sap.com/india/products/artificial-intelligence/ai-ethics.html)
+> **References:** [Agent Builder](https://www.sap.com/products/financial-management/joule-studio-agent-builder.html) · [Responsible AI](https://www.sap.com/india/products/artificial-intelligence/ai-ethics.html)
 
 ---
 
 ### 6.7 — Agent Execution Observability & TracingRequire step-level tracing for any agent with more than one reasoning or tool-call hop, capturing inputs, intermediate decisions, and tool calls in a structured (not free-text) form that supports programmatic querying for debugging and audit. Minimum trace fields: step ID, step type (LLM call / tool call / routing decision), inputs, outputs, latency, model or tool identity, and error state. Trace data must be accessible to both engineering (debugging) and support tiers (incident investigation) with a defined, compliance-aligned retention period.
 
-> **References:** [AI Launchpad](https://help.sap.com/docs/ai-launchpad/sap-ai-launchpad/what-is-sap-ai-launchpad?locale=en-US) · [AI Core API](https://ekg.cloud.sap/SAP/BAH/SAPIH/RAP/AICoreAI_CORE_API)
+> **References:** [AI Launchpad](https://help.sap.com/docs/ai-launchpad/sap-ai-launchpad/what-is-sap-ai-launchpad?locale=en-US)
 
 ---
 
@@ -340,14 +331,12 @@ SAP AI Core is the runtime infrastructure for serving AI models, managing traini
 ### 7.1 — AI-Driven Exploratory Testing (AET)
 AET (J1186) to generate and execute test flows across the agent's functional surface, including edge cases not covered by the regression suite. AET clearance is distinct from the Agent Regression Testing Environment (7.5) and both must pass. GA is targeted for December 2027. Maintain an interim testing approach until GA is confirmed.
 
-> **References:** [AET (AIF)](https://ekg.cloud.sap/SAP/MXP/JV/AIF/AIDrivenExploratoryTestingAETAutomatedTestCaseGenerationJ1186) · [AET (Product)](https://community.sap.com/t5/technology-blog-posts-by-sap/ai-driven-exploratory-testing-aet-a-tester-s-point-of-view/ba-p/14370086)
+> **References:** [AET (Product)](https://community.sap.com/t5/technology-blog-posts-by-sap/ai-driven-exploratory-testing-aet-a-tester-s-point-of-view/ba-p/14370086)
 
 ---
 
 ### 7.2 — Integration Validation
 End-to-end validation that the agent integrates correctly with all connected backend systems, APIs, and data sources under production-like conditions. Must cover authentication flows, permission boundary enforcement, error handling for downstream failures, and performance under expected peak load. Integration validation must be repeated after any backend system change, API version update, or agent tool addition — it is not a one-time pre-release activity.
-
-> **References:** [AI Core API](https://ekg.cloud.sap/SAP/BAH/SAPIH/RAP/AICoreAI_CORE_API)
 
 ---
 
@@ -361,13 +350,11 @@ Production CBC toggle activation is the final configuration step before the feat
 ### 7.4 — Cross-Functional Sign-Off
 Structured sign-off from all mandatory review functions before go-live: Product, Engineering, Commercialisation, Legal / Compliance, Responsible AI, Support (ESCE), and Security. Each function confirms that their respective pillar checklist items are complete; sign-off is recorded in the feature's governance record. Cross-functional sign-off is the final gate before CBC toggle activation (7.3) and the official release record.
 
-> **References:** [ESCE Term](https://ekg.cloud.sap/SAP/LX/TM/TRM/ESCE5CF3FCDB46F61EE7A8859EFC21919645) · [Responsible AI](https://www.sap.com/india/products/artificial-intelligence/ai-ethics.html)
+> **References:** [Responsible AI](https://www.sap.com/india/products/artificial-intelligence/ai-ethics.html)
 
 ---
 
 ### 7.5 — Agent Regression Testing EnvironmentEstablish a dedicated non-production environment with production parity and a versioned regression test suite covering all known agent behaviours. Full regression suite execution is mandatory before any model update, tool change, KG schema change, or prompt template update is promoted to production. The environment maintains a pass/fail baseline from the previous production release; any change causing a regression is an automatic release blocker. Distinct from AI-Driven Exploratory Testing (AET) (7.1).
-
-> **References:** [AET (AIF)](https://ekg.cloud.sap/SAP/MXP/JV/AIF/AIDrivenExploratoryTestingAETAutomatedTestCaseGenerationJ1186)
 
 ---
 
@@ -405,14 +392,12 @@ Define and measure the response time budget for user-facing interactions from us
 
 ### 8.5 — Orchestration / Reasoning Layer PerformanceMeasure the time and token cost of the agent's orchestration and reasoning steps, excluding UI rendering and backend API calls. For multi-hop agents, each reasoning hop must have an individual latency budget; runaway reasoning loops that consume excessive tokens must be detected and bounded by configurable step limits. Orchestration performance directly impacts the Cost Per Transaction Baseline (4.6) — unbudgeted reasoning hops are one of the leading causes of unexpected cost overrun.
 
-> **References:** [Orchestration Service](https://help.sap.com/docs/ai-launchpad/sap-ai-launchpad/orchestration-4953dc10c6dd48fe85f37b41109dffe2?locale=en-US) · [AI Core API](https://ekg.cloud.sap/SAP/BAH/SAPIH/RAP/AICoreAI_CORE_API)
+> **References:** [Orchestration Service](https://help.sap.com/docs/ai-launchpad/sap-ai-launchpad/orchestration-4953dc10c6dd48fe85f37b41109dffe2?locale=en-US)
 
 ---
 
 ### 8.6 — Backend / Tool Call Performance
 Measure the latency of each tool call (API invocation, database query, KG lookup) as an independent performance dimension; backend latency is typically the dominant contributor to total agent response time in multi-tool agentic workflows. Each tool must have a defined timeout and a tested fallback when the timeout is breached. Tool call performance is logged by Agent Execution Observability & Tracing (6.7) and reported on the operational dashboard post go-live.
-
-> **References:** [AI Core API](https://ekg.cloud.sap/SAP/BAH/SAPIH/RAP/AICoreAI_CORE_API)
 
 ---
 
@@ -464,14 +449,14 @@ For small, deterministic data sets (e.g., user profile, current session context,
 ### 10.1 — Runtime KG Dependency Resolution
 Implement dynamic resolution of agent dependencies (skills, tools, model endpoints, data sources) via the SAP KG at runtime rather than hard-coding references at build time, enabling agents to adapt automatically to infrastructure changes without a code deployment. The dependency resolution mechanism must have a defined and tested fallback when the KG is unavailable, preventing a KG outage from propagating into an agent outage. Connects to the architecture drift detection loop (10.5).
 
-> **References:** [SAP Knowledge Graph Concept](https://www.sap.com/products/artificial-intelligence/knowledge-graph.html) · [AI Core API](https://ekg.cloud.sap/SAP/BAH/SAPIH/RAP/AICoreAI_CORE_API)
+> **References:** [SAP Knowledge Graph Concept](https://www.sap.com/products/artificial-intelligence/knowledge-graph.html)
 
 ---
 
 ### 10.2 — Agent Tool Dependency Map
 Maintain a live dependency map documenting every external tool, API, data source, and model endpoint the agent calls, with version pinning, SLA requirements, and change-notification contacts. The dependency map is the primary input to impact analysis when any dependency changes and is used by the Agent Regression Testing Environment (7.5) to determine which test scenarios must be re-run. An out-of-date dependency map is treated as an Architecture Drift Detection incident (10.5).
 
-> **References:** [AI Core API](https://ekg.cloud.sap/SAP/BAH/SAPIH/RAP/AICoreAI_CORE_API) · [Skills Governance Agent (J2259)](https://learning.sap.com/courses/exploring-joule-and-ai-agents-in-sap-successfactors/introducing-skills-assistants-and-agents_ad8e62d6-372b-4ba4-ad74-152130786666)
+> **References:** [Skills Governance Agent (J2259)](https://learning.sap.com/courses/exploring-joule-and-ai-agents-in-sap-successfactors/introducing-skills-assistants-and-agents_ad8e62d6-372b-4ba4-ad74-152130786666)
 
 ---
 
@@ -485,7 +470,7 @@ Continuously monitor the selected LLM for quality degradation relative to the pr
 ### 10.4 — Data Drift Detection
 Monitor the statistical properties of data flowing through the RAG pipeline (document corpus, user query distribution, retrieved context distribution) to detect shifts that degrade grounding quality below acceptable thresholds. Data drift that goes undetected silently reduces faithfulness and context relevance scores — the primary cause of invisible quality degradation in production. Automated alerts when drift metrics exceed thresholds must trigger re-evaluation of the RAG Evaluation Scorecard scores (L0-3).
 
-> **References:** [Document Grounding](https://discovery-center.cloud.sap/ai-feature/fedeca14-3e69-472c-a0ea-82396735c35f/) · [Document Grounding API](https://ekg.cloud.sap/SAP/BAH/SAPIH/RAP/GroundingDOCUMENT_GROUNDING_API)
+> **References:** [Document Grounding](https://discovery-center.cloud.sap/ai-feature/fedeca14-3e69-472c-a0ea-82396735c35f/)
 
 ---
 
@@ -512,8 +497,6 @@ Production Model Drift Detection alerts (10.3) feed directly back into the LLM b
 ### Loop 2 — Data & Grounding Quality
 **L0-3 RAG Quality Evaluation ↔ L0-10.4 Data Drift Detection**
 Data Drift Detection alerts (10.4) feed back into the RAG quality evaluation pipeline (L0-3): a drift event triggers re-evaluation of the RAG Evaluation Scorecard (3.3) and review of the document grounding setup (3.1). The loop closes the gap between pre-release grounding quality and the evolving state of the enterprise document corpus in production.
-
-> **References:** [Document Grounding API](https://ekg.cloud.sap/SAP/BAH/SAPIH/RAP/GroundingDOCUMENT_GROUNDING_API)
 
 ---
 
@@ -607,4 +590,4 @@ Architecture Drift Detection events (10.5) and KG Freshness & Staleness Manageme
 
 ---
 
-*Enriched with L2 descriptions and SAP reference links. SAP Knowledge Graph and internal-catalogue links are sourced from ekg.cloud.sap; public references are sourced from sap.com, help.sap.com, learning.sap.com, community.sap.com, architecture.learning.sap.com, and the SAP Discovery Center. Idea2Value link provided by programme: https://idea-agent.cfapps.us10-001.hana.ondemand.com/ · SAP AI Core Pricing (PAYG): https://discovery-center.cloud.sap/serviceCatalog/sap-ai-core/?region=all&tab=service_plan&commercialModel=payg*
+*Enriched with L2 descriptions and SAP reference links. Public references sourced from sap.com, help.sap.com, learning.sap.com, community.sap.com, architecture.learning.sap.com, and the SAP Discovery Center.*

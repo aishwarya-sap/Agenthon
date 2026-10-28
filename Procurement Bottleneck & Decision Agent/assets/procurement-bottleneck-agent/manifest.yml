@@ -22,9 +22,9 @@ applications:
       SAP_MODE: accelerator_hub
       # Project-data source: SAP_PS (Phase 2) or EXCEL (Phase 1 upload).
       PROJECT_DATA_SOURCE: SAP_PS
-      # Agent card URL — MUST match the CF landscape. us10-001 = internal BAI dev account.
-      # Change to the client region (e.g. jp10 / ap21) when deploying to their subaccount.
-      AGENT_PUBLIC_URL: https://procurement-bottleneck-agent.cfapps.us10-001.hana.ondemand.com
+      # Agent card URL — MUST match the CF landscape. Update to your BTP subaccount's CF domain.
+      # Change to the client region before deploying to their subaccount.
+      AGENT_PUBLIC_URL: https://procurement-bottleneck-agent.cfapps.<region>.hana.ondemand.com
     # services: — bound in Phase B/C. BAI data-phase supplies AI Core creds via
     # `cf set-env` (AICORE_*), so no service instances are required to push.
     #   - procurement-agent-aicore      # cf create-service aicore ... (SAP AI Core)
