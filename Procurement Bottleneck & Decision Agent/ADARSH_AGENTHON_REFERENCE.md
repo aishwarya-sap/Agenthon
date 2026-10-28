@@ -23,7 +23,7 @@
 | | BAI (our dev/test) | Adarsh client DEV |
 |---|---|---|
 | Purpose | build + end-to-end test first | integration + demo |
-| AI Core creds | `/Users/I778959/Documents/MaxForum/BAI-AICore-Credentials.md` (used at `cf push`, never copied into repo) | Adarsh AI Core (plan Extended, RG `grounding`) |
+| AI Core creds | Keep your AI Core service key secure — copy values into `.env` at `cf push`, never into the repo | Adarsh AI Core (plan Extended, RG `grounding`) |
 | S/4 data | **SAP Business Accelerator Hub sandbox** (APIKey) | S/4HANA **on-prem** ABAP (SID ADV, client 100) via Cloud Connector |
 | Region | (BAI) | **Tokyo (ap)** — chosen because India BTP region is thin on AI/Joule services; confirm Joule A2A is live in-tenant + prod data-residency |
 
@@ -246,7 +246,7 @@ Clean history, no secrets (scan), `.env.example` only, README + run/deploy, all 
 
 ## 9. agent build checklist (reference) — status & pending
 
-Source: `/Users/I778959/Documents/SAP VsCode/architecture_engineering_portal/SAP BTPAIAgentChecklist-main/Agent_Checklist_Master_List_v5.md`.
+Source: `docs/checklists/agent-checklist-L0-L10.md` in this repo.
 
 **The 7 ❌ are tenant-only (cannot close offline):**
 - 2.2 / 2.4 / 2.5 — model benchmarking agent + dashboard + ongoing re-eval

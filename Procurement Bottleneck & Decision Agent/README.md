@@ -51,8 +51,7 @@ curl -s -X POST http://localhost:8080/ -H 'Content-Type: application/json' -d '{
 Open `demo/index.html` in a browser (agent running as above) for a click-through demo.
 
 ## Deploy to Cloud Foundry (you run this)
-Secrets are never in the repo. Bind the AI Core service key from
-`/Users/I778959/Documents/Common Repo/BAI-AICore-Credentials.md` at push time.
+Secrets are never in the repo. Bind the AI Core service key from your secure credentials store at push time.
 ```bash
 cd "assets/procurement-bottleneck-agent"
 cf login -a https://api.cf.us10.hana.ondemand.com --sso          # always --sso

@@ -1,9 +1,9 @@
 # Copier provenance (hand-aligned, not copier-generated).
-# This agent was built before adoption of the gdhaifactory-agentic-pipeline copier template
-# and then hand-aligned to its structure. These answers record the intended template mapping
-# so a future `copier update` / regeneration has the parameters; `_src_path` is the template
-# this repo is aligned to, not a commit this repo was generated from.
-_src_path: cea-csd-gdh-dev-tools/plugins/gdhaifactory-agentic-pipeline/templates/agent
+# This agent was hand-aligned to the agent build standard template structure.
+# These answers record the intended template mapping so a future regeneration
+# has the parameters; _src_path is the template this repo is aligned to,
+# not a commit this repo was generated from.
+_src_path: agent-build-standard/templates/agent
 _commit: hand-aligned-2026-10-27
 project_name: procurement-bottleneck-decision-agent
 agent_display_name: Procurement Bottleneck & Decision Agent

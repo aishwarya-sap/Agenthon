@@ -72,7 +72,7 @@ For Joule integration (can be done after the CF demo is working):
    - Create resource group `default` (or use the one in the service key)
    - Deploy model: `anthropic--claude-4-5-sonnet` (check available models in your region)
    - Deploy fallback: `anthropic--claude-3-5-haiku`
-3. Note the values — they're already in `/Users/I778959/Documents/MaxForum/BAI-AICore-Credentials.md`
+3. Note the values — keep your AI Core service key credentials secure (never commit them); copy values into `.env` at deploy time.
 
 ### Step 4 — Create the `aicore-creds` user-provided service
 
@@ -80,12 +80,12 @@ This project ships AI Core credentials via `.env` + `cf push` (see Part 2) — t
 simplest path, and the one the sibling agents use. The alternative below (a bound
 user-provided service) is only needed if you prefer secrets in CF's vault instead
 of the pushed `.env`. **Either way, never put real credentials in a tracked file** —
-pull them from `/Users/I778959/Documents/MaxForum/BAI-AICore-Credentials.md` at the
+pull them from your AI Core service key at the
 moment you run the command.
 
 ```bash
 # OPTIONAL (only if NOT using the .env path): bind a user-provided service.
-# Replace every <...> with the values from BAI-AICore-Credentials.md — do not commit them.
+# Replace every <...> with the values from your AI Core service key — do not commit them.
 cf create-user-provided-service aicore-creds -p '{
   "AICORE_AUTH_URL": "<auth-url>",
   "AICORE_BASE_URL": "<base-url>",
@@ -125,7 +125,7 @@ cf login -a https://api.cf.us10-001.hana.ondemand.com   # us10 endpoint
 
 ```bash
 # From the project root (where mta.yaml lives)
-cd "/Users/I778959/Documents/SAP VsCode/Agenthon/Savic+Adarsh/Project Material Availability & Supply Risk Agent"
+cd "<path-to-project-root>/Project Material Availability & Supply Risk Agent"
 
 # Build the MTA archive
 mbt build
@@ -262,7 +262,7 @@ Or run the CLI command directly:
 
 ```bash
 # Requires Joule CLI (install from SAP Tooling page)
-cd "/Users/I778959/Documents/SAP VsCode/Agenthon/Savic+Adarsh/Project Material Availability & Supply Risk Agent/joule"
+cd "<path-to-project-root>/Project Material Availability & Supply Risk Agent/joule"
 
 joule capability deploy \
   --path ./da.sapdas.yaml \

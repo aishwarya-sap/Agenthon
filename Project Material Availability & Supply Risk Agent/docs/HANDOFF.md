@@ -1,6 +1,6 @@
 # Developer Hand-off — Project Material Availability & Supply Risk Agent
 
-**Repo:** `https://github.tools.sap/SAP-BTP/Savic-Adarsh-Developers-Agenthon` · branch `main`
+**Repo:** `https://github.com/aishwarya-sap/Agenthon` · branch `main`
 **Status:** Build complete — specs written, agent deployed to CF (us10) and healthy, 175 tests green (73% coverage), quality gate PASS, code review PASS. Joule registration + principal-propagation end-to-end test pending (tenant-side config). HANA-backed memory pending.
 **Checklist tracker:** `docs/checklists/agent-checklist-L0-L10.md` in this repo
 
