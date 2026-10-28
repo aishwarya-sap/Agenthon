@@ -9,7 +9,7 @@ Advisory, read-only SAP A2A agent on BTP Cloud Foundry. Hand-built to the build 
 See `docs/CHANGELOG.md`.
 
 ### Approval
-Production readiness tracked in `docs/agent-checklist-assessment.md` against the v5 Agent Checklist (`docs/checklists/agent-checklist-L0-L10.md`).
+Production readiness tracked in `docs/checklists/agent-checklist-L0-L10.md` against the agent build checklist (`docs/checklists/agent-checklist-L0-L10.md`).
 
 ## Architecture
 

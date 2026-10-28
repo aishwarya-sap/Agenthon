@@ -27,5 +27,5 @@ gunicorn app.main:app -c gunicorn.conf.py   # production entry (CF Procfile)
 
 ## Governance
 Tracked against the agent build checklist:
-`docs/checklists/agent-checklist-L0-L10.md`; per-pillar status in `docs/agent-checklist-assessment.md`.
-Pillar numbering mirrors the `governance/*.md` artifacts. Decisions in `docs/decisions/`.
+`docs/checklists/agent-checklist-L0-L10.md`; per-pillar status in `docs/checklists/agent-checklist-L0-L10.md`.
+Decisions in `docs/decisions/`.

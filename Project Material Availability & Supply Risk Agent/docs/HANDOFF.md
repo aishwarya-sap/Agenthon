@@ -2,7 +2,7 @@
 
 **Repo:** `https://github.tools.sap/SAP-BTP/Savic-Adarsh-Developers-Agenthon` · branch `main`
 **Status:** Build complete — specs written, agent deployed to CF (us10) and healthy, 175 tests green (73% coverage), quality gate PASS, code review PASS. Joule registration + principal-propagation end-to-end test pending (tenant-side config). HANA-backed memory pending.
-**Checklist tracker:** `docs/agent-checklist-assessment.md` in this repo
+**Checklist tracker:** `docs/checklists/agent-checklist-L0-L10.md` in this repo
 
 ---
 
@@ -35,7 +35,7 @@ Design decisions: LangChain/LangGraph · Single agent · Advisory-only + HITL ·
 | `docs/specs/technical-specification.md` | As-built design: components, data model, real S/4 OData services + entities, security, deployment |
 | `docs/specs/rtm.md` | Requirements → implementation → test traceability (100%) |
 | `docs/checklists/agent-checklist-L0-L10.md` | agent build checklist |
-| `docs/agent-checklist-assessment.md` | Per-pillar readiness status for this agent |
+| `docs/checklists/agent-checklist-L0-L10.md` | Per-pillar readiness status for this agent |
 | `CODE_WALKTHROUGH.md` | Module map + request lifecycle |
 
 ---

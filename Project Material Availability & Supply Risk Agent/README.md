@@ -109,8 +109,7 @@ Copy `assets/material-risk-agent/.env.example` → `.env` and fill in:
 - [CODE_WALKTHROUGH.md](CODE_WALKTHROUGH.md) — module map + request lifecycle
 - [REQUIREMENTS.md](REQUIREMENTS.md) — scope, APIs, acceptance criteria
 - [docs/INTEGRATION_GUIDE.md](docs/INTEGRATION_GUIDE.md) — CF deploy + Joule registration + principal propagation steps
-- [agent-outcome-report.md](agent-outcome-report.md) — KG v5 checklist tally
-- [governance/sprint_tracker.md](governance/sprint_tracker.md) — sprint-by-sprint progress
+- [governance/sprint_tracker.md] — sprint-by-sprint progress
 
 ---
 

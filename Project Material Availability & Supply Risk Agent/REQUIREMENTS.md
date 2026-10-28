@@ -61,11 +61,11 @@ Permitted side effects (after explicit HITL approval only): log an intervention-
 
 | Requirement | Value |
 |---|---|
-| Latency SLO | p50 ≤ 6s, p95 ≤ 15s (time-to-complete-report) — validate on live (governance/8.4) |
+| Latency SLO | p50 ≤ 6s, p95 ≤ 15s (time-to-complete-report) — validate on live |
 | Concurrency | Low (1–5 simultaneous users) |
 | Data residency region | us10 (SAP BTP) |
 | PII in scope | SAP user IDs (routing only), vendor legal-entity names — redacted in RAG path |
-| Token ceiling | ≤ 52,000 tokens/run; summarization at 30k (governance/4.6) |
+| Token ceiling | ≤ 52,000 tokens/run; summarization at 30k |
 
 ## 7. Acceptance criteria
 

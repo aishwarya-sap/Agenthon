@@ -35,7 +35,6 @@ All notable changes to the Procurement Bottleneck & Decision Agent. Format follo
 ### Governance
 - Adopted the authoritative **agent build checklist** (, L0-1 … L0-10) as
   the single checklist: `docs/checklists/agent-checklist-L0-L10.md`, with the per-pillar assessment in
-  `docs/agent-checklist-assessment.md`. (Supersedes an interim QG/CR framing; the pillar numbering
-  matches the `governance/*.md` artifacts.)
+  `docs/checklists/agent-checklist-L0-L10.md`. (Supersedes an interim QG/CR framing; the pillar numbering)
 - Added a HANA Cloud persistence placeholder (`MEMORY_BACKEND=hana`) for the recommendation/approval
   audit trail + Vector Engine recall — env/config seam only, default stays in-process.

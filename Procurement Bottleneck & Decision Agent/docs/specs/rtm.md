@@ -32,5 +32,5 @@ All 9 functional requirements implemented and test-covered. 134 tests, coverage 
 | `resilience.py` | FR-9 (terminal quota handling) |
 | `sanitize.py` / `auth_ias.py` / `observability.py` | cross-cutting security + guardrails (FS §2.3) |
 
-Non-functional + security requirements (FS §2.3, §5) are evaluated in `docs/agent-checklist-assessment.md`
-against the v5 Agent Checklist (10 pillars).
+Non-functional + security requirements (FS §2.3, §5) are evaluated in `docs/checklists/agent-checklist-L0-L10.md`
+against the agent build checklist.

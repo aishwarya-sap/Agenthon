@@ -67,7 +67,7 @@ Permitted side effects (after explicit HITL approval only):
 | Data residency region | us10 (SAP BTP) / India (S/4HANA on-prem) |
 | Sovereign cloud flag | No |
 | PII in scope | SAP user IDs (routing only, not scored), vendor legal entity names |
-| Token ceiling | 52,000 tokens/run (governance/4.5) |
+| Token ceiling | 52,000 tokens/run |
 
 ## 7. Acceptance criteria
 

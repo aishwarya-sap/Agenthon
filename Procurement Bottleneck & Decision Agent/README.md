@@ -13,7 +13,6 @@ approval — are appending a decision record to its own institutional memory and
 raising an SAP Build Process Automation notification.
 
 - Idea / design: `../Design-Procurement Bottleneck & Decision Agent.pdf`
-- Governance record: [`agent-outcome-report.md`](agent-outcome-report.md) · Plan: [`implementation-plan.md`](implementation-plan.md)
 - PRD: `assets/procurement-bottleneck-agent/specification/procurement-bottleneck-agent/specification.md`
 
 ## Layout
@@ -75,7 +74,7 @@ cf push
 curl https://procurement-bottleneck-agent.cfapps.us10.hana.ondemand.com/.well-known/agent.json
 ```
 Then register the agent-card URL in Joule (admin UI or `joule deploy`). See
-`agent-outcome-report.md` §4 for the go-live gates still required (Agent-Builder
+`docs/checklists/agent-checklist-L0-L10.md` §4 for the go-live gates still required (Agent-Builder
 exception review, model benchmarking, RAG-triad, safety/red-team, cross-functional
 sign-off, drift/ops monitoring).
 

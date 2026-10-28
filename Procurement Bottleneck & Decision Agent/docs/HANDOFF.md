@@ -17,7 +17,7 @@ action for human approval, and answers free-form questions — every quantitativ
 2. `docs/specs/functional-specification.md` — what it does.
 3. `docs/specs/technical-specification.md` — how it's built (modules, flow, integration).
 4. `docs/decisions/` — the ADRs behind the non-obvious choices.
-5. `docs/checklists/agent-checklist-L0-L10.md` (v5 checklist) + `docs/agent-checklist-assessment.md` — production-readiness status.
+5. `docs/checklists/agent-checklist-L0-L10.md` (reference checklist) + `docs/checklists/agent-checklist-L0-L10.md` — production-readiness status.
 
 ## 3. Run it locally (5 minutes, no SAP needed)
 
@@ -55,4 +55,4 @@ procurement-bottleneck-agent IBD_TESTING 0 && cf restart procurement-bottleneck-
 
 Hand-built to the SAP build standard (not copier-generated). Production readiness is tracked
 against the authoritative **agent build checklist** :
-`docs/checklists/agent-checklist-L0-L10.md` — per-pillar status in `docs/agent-checklist-assessment.md`.
+`docs/checklists/agent-checklist-L0-L10.md` — per-pillar status in `docs/checklists/agent-checklist-L0-L10.md`.

@@ -184,7 +184,7 @@ Verified entity/field mapping (agent field ← real OData field):
 ## 6. Test flows & workflows
 
 ### 6.1 Offline (done — CI gate)
-`cd assets/procurement-bottleneck-agent && IBD_TESTING=1 pytest` → 124 tests, ≥70% coverage (currently ~92%). Covers tools, skills, simulation, HITL, resilience, memory, observability, A2A server, injection gate (5.6), red-team (5.3), eval dataset (2.1), RAG scorecard (3.3), IAS auth, `/whoami`.
+`cd assets/procurement-bottleneck-agent && IBD_TESTING=1 pytest` → 124 tests, ≥70% coverage (currently ~92%). Covers tools, skills, simulation, HITL, resilience, memory, observability, A2A server, injection gate, red-team, IAS auth, `/whoami`.
 
 ### 6.2 BAI end-to-end (Accelerator Hub real data)
 1. Set `S4_BASE_URL`, `S4_API_KEY`, `SAP_MODE=accelerator_hub`, unset `IBD_TESTING`.
@@ -244,10 +244,9 @@ Clean history, no secrets (scan), `.env.example` only, README + run/deploy, all 
 
 ---
 
-## 9. agent build checklist (v5, 60 items) — status & pending
+## 9. agent build checklist (reference) — status & pending
 
 Source: `/Users/I778959/Documents/SAP VsCode/architecture_engineering_portal/SAP BTPAIAgentChecklist-main/Agent_Checklist_Master_List_v5.md`.
-**Status (2026-10-17 pass): 23 ✅ / 20 ⚠️ / 7 ❌ / 10 ⏭️.** Full detail in `assets/procurement-bottleneck-agent/agent-outcome-report.md` + `governance/`.
 
 **The 7 ❌ are tenant-only (cannot close offline):**
 - 2.2 / 2.4 / 2.5 — model benchmarking agent + dashboard + ongoing re-eval
@@ -276,7 +275,6 @@ Source: `/Users/I778959/Documents/SAP VsCode/architecture_engineering_portal/SAP
 | `app/auth_ias.py`, `agent_executor.py` | IAS inbound auth (`AGENT_AUTH_MODE=ias`) |
 | `app/main.py` → `/whoami` | identity-hop diagnostic (gated) |
 | `app/tools.py`, `mcp_tools.py` | 13 tools + connectivity modes (Accelerator Hub path to add) |
-| `eval/`, `governance/`, `tests/` | eval dataset + RAG scorecard, 13 governance artifacts, 124 tests |
+| `tests/` | 120 tests |
 | `joule/` | Joule pro-code capability wrapper (deploy via Joule CLI) |
 | `.env.example` | all env vars incl. `AGENT_AUTH_MODE`, `IAS_*`, `S4_*`, `ENABLE_WHOAMI` |
-| `agent-outcome-report.md` | full L0–L10 checklist status |

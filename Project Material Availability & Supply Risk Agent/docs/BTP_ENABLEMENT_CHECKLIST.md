@@ -34,7 +34,6 @@ Legend: `[ ]` to do · **Gate** = don't proceed until this passes · Owner in (b
 - [ ] D1. Repeat A1–C5 in the Adarsh subaccount `ADARSH-CUSTOM-AI` (Tokyo region, space `AI-DEV`; their IAS/Joule/CF/S4/Cloud Connector; `S4_SERVICE_PROFILE=onprem`). (us + Adarsh)
 - [ ] D2. Switch `ENABLE_WHOAMI` **off**; confirm advisory-only + HITL still enforced. (us)
 - [ ] D3. Demo dry-run end to end in Adarsh DEV. (all)
-- [ ] D4. Close the tenant-side checklist items (benchmarking, safety dashboard, cross-functional sign-off — see `agent-outcome-report.md`). (Adarsh AI governance)
 
 ### Phase E — Decision/approval persistence (HANA Cloud)
 - [ ] E1. HANA Cloud instance + schema available in the subaccount (provision if absent). (Adarsh DBA / BTP admin)

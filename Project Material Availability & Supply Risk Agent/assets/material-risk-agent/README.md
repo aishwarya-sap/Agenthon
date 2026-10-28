@@ -79,7 +79,7 @@ See `.env.example` for the full list.
 ## Production readiness
 
 Governance outcome: **CONDITIONAL GO** — demo/Agenthon ready; 12 items deferred to live BTP tenant.  
-Full checklist status: see `agent-outcome-report.md` and `governance/`.
+Full checklist status: see `docs/checklists/agent-checklist-L0-L10.md` and `governance/`.
 
 ---
 

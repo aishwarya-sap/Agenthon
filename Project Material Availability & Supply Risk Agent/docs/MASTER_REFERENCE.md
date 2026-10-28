@@ -96,7 +96,6 @@ Project Material Availability & Supply Risk Agent/
 │   │   │   ├── mcp_providers/
 │   │   │   │   └── agw.py       # Tool provider: mock | live-S4 | Agent Gateway
 │   │   │   └── circuit_breaker.py  # LLM call circuit breaker (3 fails / 30s)
-│   │   ├── eval/                # RAG eval harness (rag_eval.py + gold set + scorecard)
 │   │   ├── governance/          # 9 governance docs mapped to SAP BTP checklist
 │   │   ├── tests/               # 154 pytest tests (all passing, 80% coverage)
 │   │   ├── asset.yaml           # Tool/ORD catalog for Agent Gateway
@@ -294,7 +293,6 @@ Key test files:
 - `tests/test_scoring.py` — BR-001..005 business rules
 - `tests/test_tools.py` — all 15 tools: signal_status, HITL, HoD gating
 - `tests/test_redteam.py` — injection resistance, HITL forgery, PII scrubbing
-- `tests/test_eval.py` — RAG eval scorecard (8 metrics, gate 0.82)
 - `tests/test_simulation.py` — 5-step simulation math
 
 ### Flow 4: E2E card probe (post-CF-deploy)
@@ -430,7 +428,7 @@ See `docs/INTEGRATION_GUIDE.md` Part 4 for full detail.
 
 ## 14. Checklist status
 
-Full detail in `assets/material-risk-agent/agent-outcome-report.md`.
+Full detail in `assets/material-risk-agent/`docs/checklists/agent-checklist-L0-L10.md`.
 
 **Verdict: CONDITIONAL GO** — go for Agenthon demo; 12 items require live BTP tenant.
 
