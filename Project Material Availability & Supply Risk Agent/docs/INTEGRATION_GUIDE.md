@@ -168,7 +168,7 @@ cf restage material-risk-agent
 
 ## Part 3 — Joule 2.0 Integration (pro-code A2A path)
 
-This section follows the architecture from [SAP Community blog by Felix Bartler](https://community.sap.com/t5/technology-blogs-by-sap/joule-a2a-connect-code-based-agents/ba-p/14069360) and the official "Integrating Joule with SAP Solutions" PDF.
+This section follows the architecture from SAP Community blog by Felix Bartler and the official "Integrating Joule with SAP Solutions" PDF.
 
 ### Prerequisite check
 
