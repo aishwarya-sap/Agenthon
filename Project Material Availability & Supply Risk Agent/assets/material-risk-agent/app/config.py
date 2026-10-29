@@ -13,6 +13,8 @@ from __future__ import annotations
 import os
 
 
+AGENT_NAME = "material-risk-agent"
+
 # --- Run mode ---------------------------------------------------------------
 def is_mock_mode() -> bool:
     """True under IBD_TESTING — fully offline against the seeded fixtures."""
