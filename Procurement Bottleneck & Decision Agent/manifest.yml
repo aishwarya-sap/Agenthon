@@ -1,0 +1,37 @@
+---
+# Cloud Foundry deployment manifest — Procurement Bottleneck & Decision Agent
+#
+# Deploy with: cf push -f manifest.yml  (from the repo root)
+# Or via MTA:  mbt build && cf deploy mta_archives/*.mtar
+#
+# Set CF_APP_DOMAIN to your BTP subaccount's CF domain before pushing.
+# Secrets (AICORE_*, S4_API_KEY, IAS_*) are injected via cf set-env or
+# CF service bindings — never stored in this file or any committed file.
+
+applications:
+
+  # ── Agent (Python / A2A) ──────────────────────────────────────────────────
+  - name: procurement-bottleneck-agent
+    path: assets/procurement-bottleneck-agent
+    memory: 512M
+    disk_quota: 1G
+    instances: 1
+    buildpacks:
+      - python_buildpack
+    command: python -m app
+    health-check-type: http
+    health-check-http-endpoint: /.well-known/agent-card.json
+    timeout: 180
+    routes:
+      - route: procurement-bottleneck-agent.${CF_APP_DOMAIN}
+    env:
+      AGENT_PUBLIC_URL: https://procurement-bottleneck-agent.${CF_APP_DOMAIN}/
+      AGENT_MODEL: sap/anthropic--claude-4.5-sonnet
+      AGENT_MODEL_FALLBACK: sap/anthropic--claude-4.5-haiku
+      AICORE_RESOURCE_GROUP: default
+      SAP_MODE: accelerator_hub
+      PROJECT_DATA_SOURCE: SAP_PS
+    # services: — bind after initial deploy once service instances are created.
+    #   - procurement-agent-aicore        # cf create-service aicore ...
+    #   - procurement-agent-xsuaa         # cf create-service xsuaa application ... -c xs-security.json
+    #   - procurement-agent-destination   # cf create-service destination lite ...

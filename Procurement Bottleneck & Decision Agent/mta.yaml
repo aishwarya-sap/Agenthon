@@ -1,0 +1,47 @@
+_schema-version: "3.3.0"
+ID: procurement-bottleneck-decision-agent-mta
+version: 1.0.0
+description: Procurement Bottleneck & Decision Agent
+
+modules:
+
+  # ── Agent (Python) ──────────────────────────────────────────────
+  - name: procurement-bottleneck-agent
+    type: python
+    path: assets/procurement-bottleneck-agent
+    parameters:
+      buildpack: python_buildpack
+      memory: 512M
+      disk-quota: 1G
+      health-check-type: http
+      health-check-http-endpoint: /.well-known/agent-card.json
+    build-parameters:
+      builder: custom
+      # Do NOT pip-install locally: the CF python_buildpack installs requirements.txt at
+      # staging using the runtime.txt-pinned Python.
+      commands:
+        - echo "deps installed by CF python_buildpack from requirements.txt at staging"
+      build-result: .
+    properties:
+      HOST: 0.0.0.0
+      AGENT_PUBLIC_URL: ${default-url}
+      AGENT_MODEL: sap/anthropic--claude-4.5-sonnet
+      AGENT_MODEL_FALLBACK: sap/anthropic--claude-4.5-haiku
+      AICORE_RESOURCE_GROUP: default
+      SAP_MODE: accelerator_hub
+      PROJECT_DATA_SOURCE: SAP_PS
+      # AI Core credentials come from the bound aicore-creds service (VCAP_SERVICES),
+      # not from env vars. See resources section below.
+    requires:
+      - name: aicore-creds
+
+resources:
+  # Shared AI Core credentials — created once, reused across agents.
+  # Create with: cf create-user-provided-service aicore-creds -p \
+  #   '{"AICORE_CLIENT_ID":"<id>","AICORE_CLIENT_SECRET":"<secret>",
+  #     "AICORE_AUTH_URL":"<auth-url>","AICORE_BASE_URL":"<base-url>"}'
+  # `existing-service` references it without owning it — undeploy never deletes it.
+  - name: aicore-creds
+    type: org.cloudfoundry.existing-service
+    parameters:
+      service-name: aicore-creds
