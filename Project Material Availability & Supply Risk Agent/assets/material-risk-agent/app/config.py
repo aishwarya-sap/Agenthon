@@ -88,7 +88,7 @@ _SERVICE_NAMES = {
     },
     # Adarsh on-prem S/4 exposes the standard API_* OData services (client-confirmed
     # service list, 2026-10), activated in /IWFND/MAINT_SERVICE and reached via the
-    # S4HANA_DEV_HTTP destination + Cloud Connector. Same names as cloud; only the
+    # S4HANA_HTTP destination + Cloud Connector. Same names as cloud; only the
     # transport differs (destination + connectivity proxy vs. Accelerator Hub APIKey).
     "onprem": {
         "material_stock": "API_MATERIAL_STOCK_SRV",

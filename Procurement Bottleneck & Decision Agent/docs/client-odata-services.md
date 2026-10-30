@@ -1,7 +1,7 @@
 # Client S/4HANA OData Services — Adarsh (on-premise)
 
 > Authoritative list of the S/4HANA OData services both agents read in the **Adarsh client
-> environment**. On-premise ABAP, reached via the BTP destination **`S4HANA_DEV_HTTP`**
+> environment**. On-premise ABAP, reached via the BTP destination **`S4HANA_HTTP`**
 > (ProxyType **OnPremise** → SAP Cloud Connector, **BasicAuthentication**, technical user,
 > **`sap-client=150`**). Advisory / read-only: **GET only**, `$top` capped. No POST/PATCH/DELETE.
 >
@@ -63,7 +63,7 @@ the standard OData services do not return these; the agent computes them from th
 ## Connectivity
 
 ```
-BTP Destination: S4HANA_DEV_HTTP
+BTP Destination: S4HANA_HTTP
   Type:            HTTP
   ProxyType:       OnPremise            # via SAP Cloud Connector
   Authentication:  BasicAuthentication  # technical user; PrincipalPropagation is a future switch

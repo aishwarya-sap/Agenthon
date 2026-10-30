@@ -122,8 +122,8 @@ def cors_allowed_origins() -> list[str]:
 # --- S/4 connectivity (on-prem via BTP Destination + Cloud Connector) -------
 # Used when SAP_MODE=onprem. Credentials live in the destination; nothing secret here.
 def s4_destination() -> str:
-    """BTP destination name for on-prem S/4 (default: the client's S4HANA_DEV_HTTP)."""
-    return os.environ.get("S4_DESTINATION", "S4HANA_DEV_HTTP")
+    """BTP destination name for on-prem S/4 (default: the client's S4HANA_HTTP)."""
+    return os.environ.get("S4_DESTINATION", "S4HANA_HTTP")
 
 
 def s4_sap_client() -> str:

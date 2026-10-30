@@ -35,7 +35,7 @@ FAKE_CREDS = {
 
 FAKE_VCAP = json.dumps({"destination": [{"credentials": FAKE_CREDS}]})
 
-# BasicAuthentication destination (the client's S4HANA_DEV_HTTP): OnPremise proxy,
+# BasicAuthentication destination (the client's S4HANA_HTTP): OnPremise proxy,
 # sap-client=150, ready Authorization: Basic header in authTokens[0].http_header.
 FAKE_DEST_RESPONSE = {
     "destinationConfiguration": {
@@ -111,7 +111,7 @@ def _patch_destination_service(monkeypatch, vcap=FAKE_VCAP, dest_body=None):
 
 def test_resolve_destination_returns_ctx_basic(monkeypatch):
     _patch_destination_service(monkeypatch)
-    ctx = _resolve_destination("S4HANA_DEV_HTTP", user_token=None)
+    ctx = _resolve_destination("S4HANA_HTTP", user_token=None)
     assert ctx["base_url"] == "https://s4.client.example"
     assert ctx["auth_header"] == "Basic dXNlcjpwdw=="     # from authTokens http_header
     assert ctx["proxy_type"] == "OnPremise"
@@ -121,21 +121,21 @@ def test_resolve_destination_returns_ctx_basic(monkeypatch):
 def test_resolve_destination_forwards_user_token(monkeypatch):
     """PrincipalPropagation placeholder: X-user-token forwarded when present."""
     calls = _patch_destination_service(monkeypatch)
-    _resolve_destination("S4HANA_DEV_HTTP", user_token="user-jwt")
+    _resolve_destination("S4HANA_HTTP", user_token="user-jwt")
     get_calls = [c for c in calls if c[0] == "get"]
     assert get_calls and get_calls[0][2].get("X-user-token") == "user-jwt"
 
 
 def test_resolve_destination_no_user_token(monkeypatch):
     calls = _patch_destination_service(monkeypatch)
-    _resolve_destination("S4HANA_DEV_HTTP", user_token=None)
+    _resolve_destination("S4HANA_HTTP", user_token=None)
     assert "X-user-token" not in [c for c in calls if c[0] == "get"][0][2]
 
 
 def test_resolve_destination_cached(monkeypatch):
     calls = _patch_destination_service(monkeypatch)
-    _resolve_destination("S4HANA_DEV_HTTP", user_token="u1")
-    _resolve_destination("S4HANA_DEV_HTTP", user_token="u1")
+    _resolve_destination("S4HANA_HTTP", user_token="u1")
+    _resolve_destination("S4HANA_HTTP", user_token="u1")
     assert len([c for c in calls if c[0] == "get"]) == 1
 
 
@@ -145,7 +145,7 @@ def test_resolve_destination_basic_from_user_password(monkeypatch):
                                           "User": "ABAP-SUPPORT", "Password": "pw"},
             "authTokens": []}
     _patch_destination_service(monkeypatch, dest_body=body)
-    ctx = _resolve_destination("S4HANA_DEV_HTTP", user_token=None)
+    ctx = _resolve_destination("S4HANA_HTTP", user_token=None)
     assert ctx["auth_header"].startswith("Basic ")
 
 
@@ -153,14 +153,14 @@ def test_resolve_destination_no_auth_is_allowed(monkeypatch):
     """No authTokens and no User/Password → auth_header None (does not raise)."""
     body = {"destinationConfiguration": {"URL": "https://s4.example"}, "authTokens": []}
     _patch_destination_service(monkeypatch, dest_body=body)
-    assert _resolve_destination("S4HANA_DEV_HTTP", user_token=None)["auth_header"] is None
+    assert _resolve_destination("S4HANA_HTTP", user_token=None)["auth_header"] is None
 
 
 def test_resolve_destination_no_url_raises(monkeypatch):
     _patch_destination_service(monkeypatch, dest_body={"destinationConfiguration": {"URL": ""},
                                                        "authTokens": [{"value": "tok"}]})
     with pytest.raises(RuntimeError, match="has no URL configured"):
-        _resolve_destination("S4HANA_DEV_HTTP", user_token=None)
+        _resolve_destination("S4HANA_HTTP", user_token=None)
 
 
 def test_resolve_destination_auth_token_error_raises(monkeypatch):
@@ -168,7 +168,7 @@ def test_resolve_destination_auth_token_error_raises(monkeypatch):
         "destinationConfiguration": {"URL": "https://s4.example"},
         "authTokens": [{"error": "Token exchange failed: user not found"}]})
     with pytest.raises(RuntimeError, match="Token exchange failed"):
-        _resolve_destination("S4HANA_DEV_HTTP", user_token="bad-jwt")
+        _resolve_destination("S4HANA_HTTP", user_token="bad-jwt")
 
 
 # --- _odata_get — profile branching ----------------------------------------

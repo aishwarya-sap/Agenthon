@@ -43,7 +43,7 @@ SANDBOX_BASE = os.environ.get(
     "https://sandbox.api.sap.com/s4hanacloud/sap/opu/odata/sap",
 )
 S4_API_KEY = os.environ.get("S4_API_KEY", "")           # Accelerator Hub APIKey (from .env)
-S4_DESTINATION = os.environ.get("S4_DESTINATION", "S4HANA_DEV_HTTP")  # BTP dest name (on-prem)
+S4_DESTINATION = os.environ.get("S4_DESTINATION", "S4HANA_HTTP")  # BTP dest name (on-prem)
 DEFAULT_PLANT = os.environ.get("S4_PLANT", "1710")
 
 _TIMEOUT = httpx.Timeout(30.0)

@@ -18,7 +18,7 @@ All configuration is read from the **process environment** (`os.environ`). There
 ## S/4HANA (on-prem via BTP Destination + Cloud Connector — `SAP_MODE=onprem`)
 | Variable | Default | Purpose |
 |---|---|---|
-| `S4_DESTINATION` | `S4HANA_DEV_HTTP` | BTP destination name (OnPremise, BasicAuthentication) |
+| `S4_DESTINATION` | `S4HANA_HTTP` | BTP destination name (OnPremise, BasicAuthentication) |
 | `S4_SAP_CLIENT` | `150` | Client number appended to on-prem OData calls |
 | `S4_SCC_LOCATION_ID` | unset | Cloud Connector Location ID (only if your SCC uses one) |
 | `S4_BASE_URL` / `S4_API_KEY` | unset | Accelerator Hub sandbox path only (`SAP_MODE=accelerator_hub`) |

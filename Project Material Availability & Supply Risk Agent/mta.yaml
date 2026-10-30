@@ -27,7 +27,7 @@ modules:
       AGENT_PUBLIC_URL: ${default-url}
       # On-prem S/4 via BTP Destination + Cloud Connector (BasicAuthentication).
       S4_SERVICE_PROFILE: onprem
-      S4_DESTINATION: S4HANA_DEV_HTTP
+      S4_DESTINATION: S4HANA_HTTP
       S4_SAP_CLIENT: "150"
       # Decision persistence defaults to in-process; flip to hana after provisioning
       # HANA Cloud + running docs/hana/ZAGENT_DECISION_LOG.sql, and bind the hana service.
@@ -71,7 +71,7 @@ resources:
     parameters:
       service: aicore
       service-plan: extended
-  # BTP Destination Service — resolves S4HANA_DEV_HTTP at runtime (no creds in repo).
+  # BTP Destination Service — resolves S4HANA_HTTP at runtime (no creds in repo).
   - name: material-risk-destination
     type: org.cloudfoundry.managed-service
     parameters:

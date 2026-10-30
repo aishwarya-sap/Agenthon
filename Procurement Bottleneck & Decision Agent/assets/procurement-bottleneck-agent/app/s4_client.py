@@ -43,7 +43,7 @@ def _headers() -> dict[str, str]:
 #   X-user-token so the destination exchanges it; switch is destination-side only.
 # The APIKey (accelerator_hub) path above is unchanged.
 # ---------------------------------------------------------------------------
-_S4_DESTINATION = os.environ.get("S4_DESTINATION", "S4HANA_DEV_HTTP")
+_S4_DESTINATION = os.environ.get("S4_DESTINATION", "S4HANA_HTTP")
 _ONPREM_CTX: dict | None = None
 _ONPREM_CTX_EXP: float = 0.0
 
