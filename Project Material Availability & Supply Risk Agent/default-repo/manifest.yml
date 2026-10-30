@@ -1,7 +1,7 @@
 ---
 # manifest.yml — SAP A2A Agent + Chat UI
 # Deploy with: ./deploy.sh (prompts for CF domain)
-# Or set CF_APP_DOMAIN env var before running: CF_APP_DOMAIN=cfapps.ap20.hana.ondemand.com cf push -f manifest.yml
+# Or set CF_APP_DOMAIN env var before running: CF_APP_DOMAIN=cfapps.<your-region>.hana.ondemand.com cf push -f manifest.yml
 
 applications:
 

@@ -354,7 +354,7 @@ See `docs/INTEGRATION_GUIDE.md` Part 2 for full detail. Summary:
 
 ```bash
 # 1. Login
-cf login -a https://api.cf.us10-001.hana.ondemand.com
+cf login -a https://api.cf.<your-region>.hana.ondemand.com
 
 # 2. Create aicore-creds UPS (one-time, see INTEGRATION_GUIDE.md §Step 4)
 cf create-user-provided-service aicore-creds -p '{"AICORE_AUTH_URL":"...","AICORE_BASE_URL":"...","AICORE_CLIENT_ID":"...","AICORE_CLIENT_SECRET":"...","AICORE_RESOURCE_GROUP":"default"}'

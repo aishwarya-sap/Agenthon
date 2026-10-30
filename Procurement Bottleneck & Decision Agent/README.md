@@ -54,7 +54,7 @@ Open `demo/index.html` in a browser (agent running as above) for a click-through
 Secrets are never in the repo. Bind the AI Core service key from your secure credentials store at push time.
 ```bash
 cd "assets/procurement-bottleneck-agent"
-cf login -a https://api.cf.us10.hana.ondemand.com --sso          # always --sso
+cf login -a https://api.cf.<your-region>.hana.ondemand.com --sso   # always --sso
 
 # Services (names match manifest.yml)
 cf create-service aicore <plan> procurement-agent-aicore
@@ -70,7 +70,7 @@ cf set-env procurement-bottleneck-agent AICORE_BASE_URL      "<serviceurls.AI_AP
 cf unset-env procurement-bottleneck-agent IBD_TESTING
 
 cf push
-curl https://procurement-bottleneck-agent.cfapps.us10.hana.ondemand.com/.well-known/agent.json
+curl https://procurement-bottleneck-agent.cfapps.<your-region>.hana.ondemand.com/.well-known/agent.json
 ```
 Then register the agent-card URL in Joule (admin UI or `joule deploy`). See
 `docs/checklists/agent-checklist-L0-L10.md` §4 for the go-live gates still required (Agent-Builder

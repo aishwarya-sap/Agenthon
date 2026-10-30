@@ -12,7 +12,7 @@ python_version: "3.11"
 framework: langgraph
 llm_provider: aicore
 runtime: cf
-landscape: us10
+landscape: "<your-btp-region>"
 port: 8080
 protocol_version: 0.3.0
 hitl_enabled: true

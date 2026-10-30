@@ -1,25 +1,23 @@
-# SAP Hyperspace / developer-portal component descriptor.
-# Register this component in the portal once the CF app is live:
-#   https://portal.hyperspace.tools.sap/projects/dxp/documentation/User-Guide/Manage-Metadata
+# Component descriptor — update the URLs below once the CF app is deployed
+# to your BTP subaccount (replace <your-cf-app-url> with the actual CF route).
 kind: component
 metadata:
   name: procurement-bottleneck-decision-agent
   displayName: Procurement Bottleneck & Decision Agent
   description: >
-    A2A Joule agent that detects supplier silence on critical-path procurement
+    A2A agent that detects supplier silence on critical-path procurement
     orders, quantifies downstream project consequence (schedule slip, idle-resource
     cost, penalty exposure, emergency-sourcing premium), and presents a
     human-approved ranked recommendation — advisory-only, no SAP writes.
   tags:
     - a2a
-    - joule
     - procurement
     - supply-chain
     - sap-btp
     - advisory-only
 spec:
   type:
-    name: joule-a2a-agent
+    name: a2a-agent
     lifecycle: development
     categories:
       - python
@@ -33,24 +31,23 @@ spec:
   ci:
     pipelineLinks:
       - name: CF App
-        url: https://procurement-bottleneck-agent.cfapps.ap20.hana.ondemand.com
+        url: https://<your-cf-app-url>
         icon: .sap-icon--factory
         description: Deployed CF application
   docs:
     techDocsLinks:
       - name: Reference Doc
-        url: https://procurement-bottleneck-agent.cfapps.ap20.hana.ondemand.com
+        url: https://<your-cf-app-url>
         icon: .sap-icon--sys-help-2
-        description: ADARSH_AGENTHON_REFERENCE.md in the repo root
+        description: Agent documentation
   links:
     - name: Agent URL
-      url: https://procurement-bottleneck-agent.cfapps.ap20.hana.ondemand.com
+      url: https://<your-cf-app-url>
       icon: .sap-icon--factory
     - name: Health Check
-      url: https://procurement-bottleneck-agent.cfapps.ap20.hana.ondemand.com/health
+      url: https://<your-cf-app-url>/health
       icon: .sap-icon--factory
   exposes:
     - api:procurement-bottleneck-a2a
   dependsOn:
     - api:sap-ai-core
-    - api:sap-business-accelerator-hub

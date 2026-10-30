@@ -13,18 +13,13 @@
 │   ├── material-risk-agent/        ← Python A2A agent (main build)
 │   │   ├── app/                    ← agent, tools, domain logic, auth
 │   │   ├── tests/                  ← 175 tests, 73% coverage
-│   │   ├── governance/             ← 14 governance artifacts
-│   │   ├── .env.example            ← all env var names (no secrets)
 │   │   └── requirements.txt
-│   └── material-risk-ui/           ← Joule-style chat UI (Node/Express)
-├── joule/                          ← Joule Studio DAS capability bundle
+│   └── material-risk-ui/           ← Chat UI (Node/Express)
 ├── docs/                           ← Integration guide, BTP checklist, flow diagrams
-├── governance/                     ← Sprint tracker, L0 checklist
 ├── default-repo/                   ← Generic SAP agent starter kit (reusable template)
 ├── manifest.yml                    ← CF deployment (parameterised domain)
 ├── mta.yaml                        ← MTA deployment descriptor
-├── deploy.sh                       ← CF push helper
-└── sonar-project.properties
+└── deploy.sh                       ← CF push helper
 ```
 
 ---

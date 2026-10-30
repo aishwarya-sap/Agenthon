@@ -32,7 +32,7 @@ For the October 28 demo, steps 1–5 (CF deploy + chat UI) are sufficient to han
 1. Open [BTP Cockpit](https://cockpit.btp.cloud.sap)
 2. Navigate to your Global Account
 3. Either reuse an existing subaccount (e.g. `DEV`) or create a new one:
-   - **Region:** us10 (matches our AI Core service key provided)
+   - **Region:** your BTP region (jp10 for Adarsh)
    - **Environment:** Cloud Foundry enabled
 4. In the subaccount, go to **Cloud Foundry → Spaces**
 5. Create a space called `AI-DEV` (or reuse if it exists)
@@ -116,7 +116,7 @@ cf install-plugin -f https://github.com/cloudfoundry/multiapps-cli-plugin/releas
 npm install -g mbt
 
 # 4. Login
-cf login -a https://api.cf.us10-001.hana.ondemand.com   # us10 endpoint
+cf login -a https://api.cf.<your-region>.hana.ondemand.com   # your CF API endpoint
 # Enter your SAP BTP email and password
 # Select org and space when prompted
 ```
