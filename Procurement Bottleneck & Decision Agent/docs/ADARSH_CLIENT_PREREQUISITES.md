@@ -18,13 +18,13 @@
 ### 2. SAP AI Core credentials
 - [ ] AI Core service instance created in the CF space
 - [ ] Service key exported (`cf create-service-key aicore-instance aicore-key`)
-- [ ] Credentials shared with BAI team via **secure channel only** (never email/chat)
+- [ ] Credentials shared with delivery team via **secure channel only** (never email/chat)
 - [ ] `clientid`, `clientsecret`, `url` (auth), `serviceurls.AI_API_URL` confirmed working
 
 ### 3. SAP Accelerator Hub / S4 OData
 - [ ] SAP Accelerator Hub sandbox API key created at [api.sap.com](https://api.sap.com)  
-  *(used for BAI test phase; replaced by on-prem in Phase C)*
-- [ ] API key shared with BAI team via secure channel
+  *(used for our environment test phase; replaced by on-prem in Phase C)*
+- [ ] API key shared with delivery team via secure channel
 
 ---
 
@@ -91,7 +91,7 @@ ProxyType:         OnPremise
 Authentication:    PrincipalPropagation
 ```
 
-*(BAI team will do this in BTP cockpit → Destinations)*
+*(delivery team will do this in BTP cockpit → Destinations)*
 
 ---
 
@@ -146,7 +146,7 @@ Phase A — Infra ready
   [ ] P0.3  Accelerator Hub API key shared
 
 Phase B — Joule integration
-  [ ] P1.1  IAS admin access (15 min for BAI to configure IAS apps)
+  [ ] P1.1  IAS admin access (15 min for our environment to configure IAS apps)
   [ ] P1.2  BTP↔IAS trust configured
 
 Phase C — S/4 on-prem connectivity
@@ -173,11 +173,11 @@ Phase D — Decision persistence
 | AI Core + API key | Adarsh IT or SAP account team |
 | SCC install + S/4 exposure | Adarsh Basis team |
 | Principal propagation (STRUST/SNC) | Adarsh Basis team |
-| IAS app configuration (B2/B3) | Adarsh IAS admin (or BAI team with admin access) |
+| IAS app configuration (B2/B3) | Adarsh IAS admin (or delivery team with admin access) |
 | HANA Cloud instance + schema + INSERT/SELECT role | Adarsh DBA / BTP admin |
-| CF agent deployment, Joule YAML deploy | BAI team (us) |
+| CF agent deployment, Joule YAML deploy | our team |
 | Demo user creation | Adarsh Basis / security team |
 
 ---
 
-*Document version: 2026-10-21. Owner: BAI team. Share with Adarsh IT and Basis teams.*
+*Document version: 2026-10-21. Owner: delivery team. Share with Adarsh IT and Basis teams.*

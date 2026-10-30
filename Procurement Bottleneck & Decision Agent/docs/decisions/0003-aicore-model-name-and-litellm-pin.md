@@ -17,4 +17,4 @@ an error log around `ChatLiteLLM.ainvoke` and reading `cf logs`.
 
 ## Consequences
 - Never swallow the LLM exception — always log it so the real cause is visible in `cf logs`.
-- When wiring a new BAI CF agent to AI Core, reuse these pins and the dot model name.
+- When wiring a new our environment CF agent to AI Core, reuse these pins and the dot model name.

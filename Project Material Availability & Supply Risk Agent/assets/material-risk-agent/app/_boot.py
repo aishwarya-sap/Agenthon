@@ -34,13 +34,37 @@ _AICORE_KEYS = (
 )
 
 
+def _map_standard_aicore_binding(creds: dict) -> dict:
+    """Translate a standard SAP AI Core service-key/binding shape into AICORE_* values.
+
+    A bound `aicore` managed service (or its service key) exposes:
+        clientid, clientsecret, url, serviceurls.AI_API_URL  (+ optional appname)
+    which is NOT what set_aicore_config() reads. Map it to the AICORE_* names.
+    """
+    service_urls = creds.get("serviceurls") or {}
+    mapped = {
+        "AICORE_CLIENT_ID": creds.get("clientid"),
+        "AICORE_CLIENT_SECRET": creds.get("clientsecret"),
+        "AICORE_AUTH_URL": creds.get("url"),
+        "AICORE_BASE_URL": service_urls.get("AI_API_URL"),
+        "AICORE_RESOURCE_GROUP": creds.get("resource_group") or "default",
+    }
+    return {k: v for k, v in mapped.items() if v}
+
+
 def apply_vcap_aicore(environ=os.environ):
     """Map a bound service's AI Core credentials from VCAP_SERVICES into AICORE_* env vars.
 
     No-op when AICORE_CLIENT_ID is already present (an explicit export / cf set-env wins) or
-    when VCAP_SERVICES is absent or unparseable. Picks the first bound service whose
-    credentials carry AICORE_CLIENT_ID, so it works for a user-provided service or a managed
-    one regardless of the binding's name.
+    when VCAP_SERVICES is absent or unparseable.
+
+    Handles both binding shapes:
+      1. Standard AI Core service binding/key — credentials carry `clientid` +
+         `serviceurls.AI_API_URL` (the shape a managed `aicore` instance binds). This is
+         the client-environment case.
+      2. Legacy user-provided service — credentials already use the AICORE_* names.
+
+    Prefers a binding under the `aicore` service name, else scans all bindings.
     """
     if environ.get("AICORE_CLIENT_ID"):
         return
@@ -51,15 +75,29 @@ def apply_vcap_aicore(environ=os.environ):
         services = json.loads(raw)
     except (ValueError, TypeError):
         return
-    for bindings in services.values():
-        for binding in bindings:
-            creds = (binding or {}).get("credentials") or {}
-            if "AICORE_CLIENT_ID" in creds:
-                for key in _AICORE_KEYS:
-                    value = creds.get(key)
-                    if value and not environ.get(key):
-                        environ[key] = value
-                return
+
+    # Search order: the `aicore` service first, then every other bound service.
+    ordered = list(services.get("aicore", []))
+    for name, bindings in services.items():
+        if name != "aicore":
+            ordered.extend(bindings or [])
+
+    for binding in ordered:
+        creds = (binding or {}).get("credentials") or {}
+        if not creds:
+            continue
+        # Shape 2: already AICORE_* named.
+        if "AICORE_CLIENT_ID" in creds:
+            values = {k: creds[k] for k in _AICORE_KEYS if creds.get(k)}
+        # Shape 1: standard AI Core binding (clientid + serviceurls.AI_API_URL).
+        elif creds.get("clientid") and (creds.get("serviceurls") or {}).get("AI_API_URL"):
+            values = _map_standard_aicore_binding(creds)
+        else:
+            continue
+        for key, value in values.items():
+            if value and not environ.get(key):
+                environ[key] = value
+        return
 
 
 def main():

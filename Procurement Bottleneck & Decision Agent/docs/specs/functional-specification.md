@@ -77,7 +77,7 @@ fully offline. Token budget design ceiling 52k/run.
 
 ## 6. Operational Considerations
 ### 6.1 Cutover / Rollout
-DEV mock → BAH sandbox (BAI test) → Adarsh Tokyo S/4 (prod). Flip `AGENT_AUTH_MODE`→ias and
+DEV mock → BAH sandbox (our environment test) → Adarsh Tokyo S/4 (prod). Flip `AGENT_AUTH_MODE`→ias and
 `ENABLE_WHOAMI`→off before production.
 ### 6.2 Operational Model
 CF app, single instance; logs to stdout → BTP Cloud Logging.

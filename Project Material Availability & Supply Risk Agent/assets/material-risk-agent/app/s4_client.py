@@ -43,7 +43,7 @@ SANDBOX_BASE = os.environ.get(
     "https://sandbox.api.sap.com/s4hanacloud/sap/opu/odata/sap",
 )
 S4_API_KEY = os.environ.get("S4_API_KEY", "")           # Accelerator Hub APIKey (from .env)
-S4_DESTINATION = os.environ.get("S4_DESTINATION", "S4_MATERIAL_RISK")  # BTP dest name (on-prem)
+S4_DESTINATION = os.environ.get("S4_DESTINATION", "S4HANA_DEV_HTTP")  # BTP dest name (on-prem)
 DEFAULT_PLANT = os.environ.get("S4_PLANT", "1710")
 
 _TIMEOUT = httpx.Timeout(30.0)
@@ -90,12 +90,21 @@ _STOCK_BLOCKED = "03"
 _DATE_RE = re.compile(r"/Date\((-?\d+)")
 
 # ---------------------------------------------------------------------------
-# BTP Destination Service — on-prem transport with Principal Propagation
+# BTP Destination Service — on-prem transport
 # ---------------------------------------------------------------------------
-# Cache: (resolved_url, s4_access_token, token_expiry_epoch)
-# Keyed by (destination_name, user_token_hash) so different users get their
-# own exchanged tokens while static dest URL is reused.
-_DEST_CACHE: dict[str, tuple[str, str, float]] = {}
+# ACTIVE: BasicAuthentication (technical user) over Cloud Connector (ProxyType
+#   OnPremise). The Destination Service returns a ready Authorization: Basic header
+#   in authTokens[0].http_header; the request is routed through the Connectivity
+#   Proxy (bound 'connectivity' service) with a Proxy-Authorization bearer.
+# PLACEHOLDER (future): PrincipalPropagation / SAMLBearer. When the destination's
+#   auth type changes to carry the user identity, the user's IAS JWT is forwarded
+#   as X-user-token and the exchanged S/4 token comes back in authTokens[0]. The
+#   X-user-token is already forwarded below so the switch is destination-side only.
+#
+# Cache: resolved destination context, keyed by (destination_name, user_token_hash)
+# so a future per-user PP exchange stays per-user while the static Basic path reuses.
+_DEST_CACHE: dict[str, tuple[dict, float]] = {}
+_CONN_TOKEN_CACHE: dict[str, tuple[str, float]] = {}
 
 
 def _vcap_destination_creds() -> dict:
@@ -105,7 +114,6 @@ def _vcap_destination_creds() -> dict:
         services = json.loads(raw)
     except json.JSONDecodeError as exc:
         raise RuntimeError("VCAP_SERVICES is not valid JSON") from exc
-    # CF binds under 'destination' or occasionally 'xsuaa-destination-service'
     bindings = services.get("destination") or services.get("xsuaa-destination-service") or []
     if not bindings:
         raise RuntimeError(
@@ -115,43 +123,73 @@ def _vcap_destination_creds() -> dict:
     return bindings[0]["credentials"]
 
 
-def _dst_service_token(creds: dict) -> str:
-    """Obtain an OAuth2 client-credentials token for the Destination service API."""
+def _vcap_connectivity_creds() -> dict | None:
+    """Parse VCAP_SERVICES for the Connectivity service binding (on-prem proxy).
+
+    Returns None when no connectivity service is bound — a Basic/Internet
+    destination then works without a proxy; an OnPremise destination requires it.
+    """
+    raw = os.environ.get("VCAP_SERVICES", "{}")
+    try:
+        services = json.loads(raw)
+    except json.JSONDecodeError:
+        return None
+    bindings = services.get("connectivity") or []
+    return bindings[0]["credentials"] if bindings else None
+
+
+def _client_credentials_token(token_url: str, client_id: str, client_secret: str) -> str:
     resp = httpx.post(
-        creds["url"].rstrip("/") + "/oauth/token",
-        data={
-            "grant_type": "client_credentials",
-            "client_id": creds["clientid"],
-            "client_secret": creds["clientsecret"],
-        },
+        token_url,
+        data={"grant_type": "client_credentials", "client_id": client_id,
+              "client_secret": client_secret},
         timeout=10,
     )
     resp.raise_for_status()
     return resp.json()["access_token"]
 
 
-def _resolve_destination(dest_name: str, user_token: str | None) -> tuple[str, str]:
-    """Call the BTP Destination REST API and return (s4_base_url, s4_auth_token).
+def _dst_service_token(creds: dict) -> str:
+    """OAuth2 client-credentials token for the Destination service REST API."""
+    return _client_credentials_token(
+        creds["url"].rstrip("/") + "/oauth/token", creds["clientid"], creds["clientsecret"])
 
-    Passing ``user_token`` (the IAS JWT from Joule) as ``X-user-token`` triggers
-    Principal Propagation: the Destination Service exchanges the IAS token for an
-    S/4-scoped credential (SAMLBearer or OAuth2SAMLBearerAssertion), which is
-    returned in ``authTokens[0].value``.
 
-    When ``user_token`` is None (technical call, no user context), the destination's
-    own OAuth2 client credentials are used — the ``authTokens`` entry still provides
-    the ready-to-use Bearer value.
+def _connectivity_proxy_token(creds: dict) -> str:
+    """OAuth2 client-credentials token for the Connectivity Proxy (cached briefly)."""
+    cached = _CONN_TOKEN_CACHE.get("tok")
+    if cached and time.time() < cached[1] - 60:
+        return cached[0]
+    token_url = creds.get("token_service_url") or (creds["url"].rstrip("/") + "/oauth/token")
+    token = _client_credentials_token(token_url, creds["clientid"], creds["clientsecret"])
+    _CONN_TOKEN_CACHE["tok"] = (token, time.time() + 3600)
+    return token
+
+
+def _resolve_destination(dest_name: str, user_token: str | None) -> dict:
+    """Resolve a BTP destination → transport context dict.
+
+    Returns ``{base_url, auth_header, proxy_type, sap_client}``.
+
+    ``auth_header`` is the ready-to-send Authorization value the Destination Service
+    computes from the stored credentials (``Basic <base64>`` for BasicAuthentication;
+    a Bearer for OAuth/SAML/PrincipalPropagation). ``proxy_type`` drives whether the
+    request is routed through the Connectivity Proxy (OnPremise) or sent directly
+    (Internet).
+
+    ``user_token`` is forwarded as ``X-user-token`` (the PrincipalPropagation hook);
+    it is harmless for BasicAuthentication and makes the future PP switch
+    destination-side only.
     """
     cache_key = f"{dest_name}:{hash(user_token)}"
     cached = _DEST_CACHE.get(cache_key)
     if cached:
-        base_url, s4_token, expiry = cached
-        if time.time() < expiry - 60:  # 60 s safety margin
-            return base_url, s4_token
+        ctx, expiry = cached
+        if time.time() < expiry - 60:
+            return ctx
 
     creds = _vcap_destination_creds()
     dst_token = _dst_service_token(creds)
-
     headers: dict = {"Authorization": f"Bearer {dst_token}"}
     if user_token:
         headers["X-user-token"] = user_token
@@ -168,30 +206,40 @@ def _resolve_destination(dest_name: str, user_token: str | None) -> tuple[str, s
     base_url = dest_cfg.get("URL", "").rstrip("/")
     if not base_url:
         raise RuntimeError(f"Destination '{dest_name}' has no URL configured.")
+    proxy_type = (dest_cfg.get("ProxyType") or "Internet").strip()
+    sap_client = dest_cfg.get("sap-client") or dest_cfg.get("sap-client".upper())
 
+    auth_header: str | None = None
     auth_tokens = body.get("authTokens") or []
-    if not auth_tokens:
-        raise RuntimeError(
-            f"Destination '{dest_name}' returned no authTokens — check the destination "
-            "authentication type and that x_user_token.jwks_uri is set."
-        )
-    token_entry = auth_tokens[0]
-    if token_entry.get("error"):
-        raise RuntimeError(
-            f"Destination '{dest_name}' auth token error: {token_entry['error']}"
-        )
-    s4_token = token_entry["value"]
-    # Cache for the token's remaining lifetime (expires_in field, or 1 hour)
-    ttl = int(token_entry.get("expires_in") or 3600)
-    _DEST_CACHE[cache_key] = (base_url, s4_token, time.time() + ttl)
+    if auth_tokens:
+        token_entry = auth_tokens[0]
+        if token_entry.get("error"):
+            raise RuntimeError(
+                f"Destination '{dest_name}' auth token error: {token_entry['error']}"
+            )
+        http_header = token_entry.get("http_header") or {}
+        if http_header.get("value"):
+            auth_header = http_header["value"]  # e.g. "Basic <base64>" / "Bearer <jwt>"
+        elif token_entry.get("value"):
+            auth_header = f"{token_entry.get('type', 'Bearer')} {token_entry['value']}"
+    # BasicAuthentication destinations may also surface User/Password directly.
+    if auth_header is None and dest_cfg.get("User") and dest_cfg.get("Password"):
+        import base64 as _b64
+        raw = f"{dest_cfg['User']}:{dest_cfg['Password']}".encode()
+        auth_header = "Basic " + _b64.b64encode(raw).decode()
 
-    logger.info("Resolved BTP Destination '%s' → %s (PP=%s)", dest_name, base_url, bool(user_token))
-    return base_url, s4_token
+    ctx = {"base_url": base_url, "auth_header": auth_header,
+           "proxy_type": proxy_type, "sap_client": sap_client}
+    _DEST_CACHE[cache_key] = (ctx, time.time() + 3600)
+    logger.info("Resolved BTP Destination '%s' → %s (proxy=%s, auth=%s)",
+                dest_name, base_url, proxy_type, "yes" if auth_header else "none")
+    return ctx
 
 
 def clear_destination_cache() -> None:
-    """Flush the destination cache (used in tests)."""
+    """Flush the destination + connectivity-token caches (used in tests)."""
     _DEST_CACHE.clear()
+    _CONN_TOKEN_CACHE.clear()
 
 
 # ---------------------------------------------------------------------------
@@ -234,22 +282,46 @@ def _odata_get(service: str, entity: str, params: dict | None = None) -> list[di
         logger.debug("S4 cache HIT %s/%s", service, entity)
         return cached
 
-    qs = "?" + urlencode({**(params or {}), "$format": "json"})
-
     if config.s4_service_profile() == "onprem":
         from mcp_providers.agw import get_user_token
         user_token = get_user_token()
-        base_url, s4_token = _resolve_destination(S4_DESTINATION, user_token)
-        # On-prem: path is /sap/opu/odata/sap/<service>/<entity>
-        url = f"{base_url}/sap/opu/odata/sap/{service}/{entity}{qs}"
-        headers = {"Accept": "application/json", "Authorization": f"Bearer {s4_token}"}
+        ctx = _resolve_destination(S4_DESTINATION, user_token)
+        # On-prem OData path; carry sap-client (destination sap-client=150).
+        all_params = {**(params or {}), "$format": "json"}
+        sap_client = ctx.get("sap_client") or config.s4_sap_client()
+        if sap_client:
+            all_params["sap-client"] = sap_client
+        qs = "?" + urlencode(all_params)
+        url = f"{ctx['base_url']}/sap/opu/odata/sap/{service}/{entity}{qs}"
+        headers = {"Accept": "application/json"}
+        if ctx.get("auth_header"):
+            headers["Authorization"] = ctx["auth_header"]
+
+        proxies = None
+        if (ctx.get("proxy_type") or "").lower() == "onpremise":
+            conn = _vcap_connectivity_creds()
+            if not conn:
+                raise RuntimeError(
+                    f"Destination '{S4_DESTINATION}' is OnPremise but no 'connectivity' "
+                    "service is bound. Bind the connectivity service to this CF app."
+                )
+            proxy_url = f"http://{conn['onpremise_proxy_host']}:{conn['onpremise_proxy_port']}"
+            proxies = proxy_url
+            headers["Proxy-Authorization"] = f"Bearer {_connectivity_proxy_token(conn)}"
+            location_id = os.environ.get("S4_SCC_LOCATION_ID")
+            if location_id:
+                headers["SAP-Connectivity-SCC-Location-ID"] = location_id
+
+        logger.info("S/4 OData GET %s (onprem, proxy=%s)", url, bool(proxies))
+        with httpx.Client(proxy=proxies, timeout=_TIMEOUT) as client:
+            resp = client.get(url, headers=headers)
     else:
+        qs = "?" + urlencode({**(params or {}), "$format": "json"})
         base_url = SANDBOX_BASE.rstrip("/")
         url = f"{base_url}/{service}/{entity}{qs}"
-        headers = _headers()
+        logger.info("S/4 OData GET %s (sandbox)", url)
+        resp = httpx.get(url, headers=_headers(), timeout=_TIMEOUT)
 
-    logger.info("S/4 OData GET %s", url)
-    resp = httpx.get(url, headers=headers, timeout=_TIMEOUT)
     resp.raise_for_status()
     body = resp.json()
     d = body.get("d") or body

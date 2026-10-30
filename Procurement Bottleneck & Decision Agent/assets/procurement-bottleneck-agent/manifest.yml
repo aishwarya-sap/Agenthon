@@ -16,7 +16,7 @@ applications:
       AGENT_MODEL: sap/anthropic--claude-4.5-sonnet
       AGENT_MODEL_FALLBACK: sap/anthropic--claude-4.5-haiku
       AICORE_RESOURCE_GROUP: default
-      # Connectivity. BAI test phase = accelerator_hub (sandbox S/4 OData via APIKey;
+      # Connectivity. our environment test phase = accelerator_hub (sandbox S/4 OData via APIKey;
       # the S4_API_KEY secret is injected separately with `cf set-env`, never here).
       # The client landscape overrides this with its own mode (gateway | onprem).
       SAP_MODE: accelerator_hub
@@ -25,7 +25,7 @@ applications:
       # Agent card URL — MUST match the CF landscape. Update to your BTP subaccount's CF domain.
       # Change to the client region before deploying to their subaccount.
       AGENT_PUBLIC_URL: https://procurement-bottleneck-agent.cfapps.<region>.hana.ondemand.com
-    # services: — bound in Phase B/C. BAI data-phase supplies AI Core creds via
+    # services: — bound in Phase B/C. our environment data-phase supplies AI Core creds via
     # `cf set-env` (AICORE_*), so no service instances are required to push.
     #   - procurement-agent-aicore      # cf create-service aicore ... (SAP AI Core)
     #   - procurement-agent-xsuaa       # cf create-service xsuaa application ... -c xs-security.json

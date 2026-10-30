@@ -16,7 +16,7 @@ D4: LLM routing — the LLM decides which tools to call per query; no regex fast
 D5: LLM-summary — multi-turn buyer sessions; summarize prior turns past 30k tokens to stay within the ~52k-token envelope
 D6: multiple read sources — SAP S/4HANA OData (stock, PO/PR, GR history, supplier, info-record, contract) + HANA Cloud Vector (RAG over supplier emails/scorecards) + structured context injection (project schedule from SAP PS or Excel)
    AGENT_BACKEND_TYPE=multiple
-   S4_SERVICE_PROFILE=cloud (BAI Accelerator Hub sandbox, APIKey) | onprem (Adarsh tenant, Destination + Cloud Connector, principal propagation)
+   S4_SERVICE_PROFILE=cloud (Accelerator Hub sandbox, APIKey) | onprem (Adarsh tenant, Destination + Cloud Connector, principal propagation)
 D10: clarification, HITL review_gate — clarify ambiguous project/material scope; mandatory review_gate before escalation / memory-write / expedite-PO writes
 D11 — rich rendering: brief-by-default markdown table + `[SUGGESTIONS]` follow-up chips (standalone UI) / Joule-side rendering
 D12 — live-first fallback: when both IBD_LIVE_S4 and IBD_TESTING are set, a failed live S/4 read falls back to seeded data tagged `signal_status=simulated` so the agent never errors a turn

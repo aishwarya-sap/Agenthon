@@ -6,8 +6,8 @@ Procurement Centre of Excellence can edit them without a code deployment; this
 module is the single source of truth consumed by the deterministic skills and the
 orchestration layer, and mirrors the Business Rules decision tables 1:1.
 
-Nothing here is a secret. Secrets are supplied at runtime via environment
-variables / Cloud Foundry VCAP_SERVICES (see .env.example), never committed.
+Nothing here is a secret. Secrets are supplied at runtime via bound service
+instances / Cloud Foundry VCAP_SERVICES and BTP Destinations, never committed.
 """
 from __future__ import annotations
 
@@ -117,6 +117,18 @@ def cors_allowed_origins() -> list[str]:
     Defaults to ['*'] (open) for local dev; must be locked to Joule/BTP origin before go-live."""
     raw = os.environ.get("CORS_ALLOWED_ORIGINS", "").strip()
     return [o.strip() for o in raw.split(",") if o.strip()] or ["*"]
+
+
+# --- S/4 connectivity (on-prem via BTP Destination + Cloud Connector) -------
+# Used when SAP_MODE=onprem. Credentials live in the destination; nothing secret here.
+def s4_destination() -> str:
+    """BTP destination name for on-prem S/4 (default: the client's S4HANA_DEV_HTTP)."""
+    return os.environ.get("S4_DESTINATION", "S4HANA_DEV_HTTP")
+
+
+def s4_sap_client() -> str:
+    """S/4 client number for on-prem OData calls (destination sap-client=150)."""
+    return os.environ.get("S4_SAP_CLIENT", "150")
 
 
 def is_mock_mode() -> bool:

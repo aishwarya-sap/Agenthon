@@ -42,7 +42,7 @@ SAP's prescribed end-to-end governance pathway for AI features, consolidating se
 ---
 
 ### 1.4 — Document - AI Commercialization Tracker
-Perform commercial calculations to determine the cost-optimal processing path based on expected user data volume: compare per-page pricing for standard Document AI services against the volume economics of GDH accelerators. Document the break-even threshold, selected approach, and pricing assumptions before any customer-scale processing begins. The chosen track drives the billing anchor for AI Scenario Metering Integration (4.2).
+Perform commercial calculations to determine the cost-optimal processing path based on expected user data volume: compare per-page pricing for standard Document AI services against the volume economics of platform accelerators. Document the break-even threshold, selected approach, and pricing assumptions before any customer-scale processing begins. The chosen track drives the billing anchor for AI Scenario Metering Integration (4.2).
 
 ---
 

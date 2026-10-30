@@ -1,0 +1,28 @@
+{
+  "xsappname": "material-risk-agent",
+  "tenant-mode": "dedicated",
+  "description": "XSUAA security descriptor for the Project Material Availability & Supply Risk Agent (advisory, read-only).",
+  "scopes": [
+    { "name": "$XSAPPNAME.Invoke", "description": "Invoke the material supply-risk agent" }
+  ],
+  "role-templates": [
+    {
+      "name": "MaterialRiskAgentUser",
+      "description": "Purchase Executive / Purchase Manager / Purchase HoD / Project Manager — may invoke the agent and approve advisory actions",
+      "scope-references": ["$XSAPPNAME.Invoke"]
+    }
+  ],
+  "role-collections": [
+    {
+      "name": "MaterialRiskAgentUser",
+      "description": "Assign to users who review material supply-risk reports and approve expedite/escalation actions",
+      "role-template-references": ["$XSAPPNAME.MaterialRiskAgentUser"]
+    }
+  ],
+  "oauth2-configuration": {
+    "token-validity": 3600,
+    "redirect-uris": [
+      "https://material-risk-agent.cfapps.ap20.hana.ondemand.com/**"
+    ]
+  }
+}

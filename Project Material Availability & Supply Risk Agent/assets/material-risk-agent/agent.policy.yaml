@@ -1,0 +1,43 @@
+# agent.policy.yaml — agent runtime policy / guardrail manifest (SEC-381 control surface).
+#
+# Declarative only: this file documents the controls the agent already enforces in code;
+# it is not executed. Confirm the exact schema against the current agent build template
+# before relying on it for automated policy checks.
+
+apiVersion: policy/v1
+kind: AgentPolicy
+metadata:
+  name: material-risk-agent
+  classification: advisory-read-only
+
+access:
+  # Inbound: validated at the A2A boundary (Joule delivers an IAS user token).
+  inbound_auth: ias            # mock | ias | xsuaa
+  public_endpoints:
+    - /.well-known/
+    - /whoami                  # gated by ENABLE_WHOAMI; off in production
+  scopes_required:
+    - $XSAPPNAME.Invoke
+
+data:
+  # Backend reads are strictly read-only; no business-object writes.
+  mode: read-only
+  forbidden_operations: [POST, PATCH, DELETE]
+  read_cap: { odata_top_max: 100 }
+  backends:
+    - s4hana        # via BTP Destination (on-prem Cloud Connector / sandbox APIKey)
+
+audit:
+  # Every recommendation + approval is persisted append-only (INSERT/SELECT only).
+  decision_log: ZAGENT_DECISION_LOG
+  append_only: true
+
+privacy:
+  pii_redaction: true          # secrets/PII redacted before logging (observability.redact)
+  log_tokens: false
+
+safety:
+  human_in_the_loop: true      # side effects require explicit approval
+  prompt_injection_detection: true
+  llm_temperature_max: 0.3
+  never_fabricate: true        # surface backend errors; never invent data

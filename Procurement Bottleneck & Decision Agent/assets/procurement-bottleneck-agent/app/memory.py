@@ -15,6 +15,8 @@ custom HANA role that grants the agent service user INSERT/SELECT only.
 """
 from __future__ import annotations
 
+import json
+import os
 import threading
 import time
 import uuid
@@ -121,27 +123,122 @@ class MemoryStore:
         )
 
 
+def _hana_credentials() -> dict:
+    """Resolve HANA Cloud connection params from the bound 'hana' service (VCAP) or HANA_* env.
+
+    Expects host / port / user / password (+ optional schema) — the standard hdbcli
+    connection shape. Raises with guidance when nothing is bound/configured.
+    """
+    raw = os.environ.get("VCAP_SERVICES")
+    if raw:
+        try:
+            services = json.loads(raw)
+        except (ValueError, TypeError):
+            services = {}
+        for name in ("hana", "hanacloud"):
+            binds = services.get(name) or []
+            if binds:
+                c = binds[0].get("credentials") or {}
+                host = c.get("host") or c.get("hostname")
+                if host and c.get("user") and c.get("password"):
+                    return {"host": host, "port": int(c.get("port") or 443),
+                            "user": c["user"], "password": c["password"],
+                            "schema": c.get("schema") or config.HANA_SCHEMA or c["user"]}
+    host = os.environ.get("HANA_HOST")
+    if host and os.environ.get("HANA_USER") and os.environ.get("HANA_PASSWORD"):
+        return {"host": host, "port": int(os.environ.get("HANA_PORT") or 443),
+                "user": os.environ["HANA_USER"], "password": os.environ["HANA_PASSWORD"],
+                "schema": os.environ.get("HANA_SCHEMA") or os.environ["HANA_USER"]}
+    raise RuntimeError(
+        "HANA Cloud is not configured. Bind a 'hana' service (host/user/password/schema) "
+        "to the CF app, or set HANA_HOST/HANA_USER/HANA_PASSWORD. "
+        "Create ZAGENT_DECISION_LOG first — see docs/hana/ZAGENT_DECISION_LOG.sql."
+    )
+
+
 class HanaMemoryStore(MemoryStore):
-    """PLACEHOLDER — durable HANA Cloud audit store for recommendations/approvals.
+    """Durable HANA Cloud audit store for recommendations/approvals.
 
-    Persists each DecisionRecord to ``<HANA_SCHEMA>.<HANA_DECISION_TABLE>`` (append-only,
-    backed by an INSERT/SELECT-only role) and uses the HANA Cloud Vector Engine
-    (``HANA_VECTOR_TABLE``) for semantic recall of the free-text annotation — behind this
-    exact ``MemoryStore`` interface, so business logic and tests do not change.
+    Persists each DecisionRecord to ``<schema>.<HANA_DECISION_TABLE>`` as JSON (append-only —
+    INSERT/SELECT only). Outcomes are appended as separate rows (never an in-place UPDATE),
+    preserving the append-only guarantee; ``all()`` merges them back. ``recall()`` and
+    ``repeat_offender()`` are inherited unchanged (they operate on ``all()``), so the ranking
+    contract is identical to the in-memory store. Selected only when ``MEMORY_BACKEND=hana``.
 
-    Not wired yet: requires the ``hdbcli`` driver and a provisioned/bound HANA Cloud
-    instance. Selected only when ``MEMORY_BACKEND=hana``. See the client prerequisites +
-    data-readiness questionnaire (docs/) for what the client must provision.
+    Requires the ``hdbcli`` driver and a provisioned/bound HANA Cloud instance. Create the
+    table with docs/hana/ZAGENT_DECISION_LOG.sql.
     """
 
-    def __init__(self) -> None:  # pragma: no cover - placeholder, not reachable in tests
-        raise NotImplementedError(
-            "HANA Cloud persistence is a placeholder. To enable MEMORY_BACKEND=hana: "
-            "provision HANA Cloud, create the ZAGENT_DECISION_LOG table (+ vector table) "
-            "under a schema with an INSERT/SELECT-only role, add the `hdbcli` dependency, "
-            "and implement append()/append_outcome()/recall() against it. "
-            "See docs/ADARSH_CLIENT_PREREQUISITES.md §HANA Cloud."
+    def __init__(self) -> None:
+        from hdbcli import dbapi  # lazy — only imported when MEMORY_BACKEND=hana
+
+        self._records = []  # unused; kept so any inherited reference never errors
+        self._lock = threading.Lock()
+        creds = _hana_credentials()
+        self._schema = creds["schema"]
+        self._table = config.HANA_DECISION_TABLE
+        self._conn = dbapi.connect(
+            address=creds["host"], port=creds["port"],
+            user=creds["user"], password=creds["password"],
+            encrypt=True, sslValidateCertificate=True, autocommit=True,
         )
+
+    def _qt(self) -> str:
+        return f'"{self._schema}"."{self._table}"'
+
+    def _insert(self, mem_type: str, record_id: str, vendor: str, material: str, payload: dict) -> None:
+        with self._lock:
+            cur = self._conn.cursor()
+            cur.execute(
+                f'INSERT INTO {self._qt()} '
+                '("RECORD_ID","MEM_TYPE","CREATED_UTC","VENDOR","MATERIAL","PAYLOAD") '
+                "VALUES (?,?,?,?,?,?)",
+                (record_id, mem_type,
+                 time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                 vendor, material, json.dumps(payload)),
+            )
+            cur.close()
+
+    def append(self, record: DecisionRecord) -> str:
+        self._insert("decision", record.record_id,
+                     record.supplier_lifnr, record.material_group, record.as_dict())
+        return record.record_id
+
+    def append_outcome(self, record_id: str, resolution_outcome: str, days_to_resolution: int) -> bool:
+        # Append-only: write a new outcome row (no UPDATE). all() merges it onto the record.
+        existing = {r.record_id: r for r in self.all()}
+        rec = existing.get(record_id)
+        if rec is None or rec.resolution_outcome:
+            return False
+        self._insert("outcome", f"{record_id}:outcome", rec.supplier_lifnr, rec.material_group,
+                     {"record_id": record_id, "resolution_outcome": resolution_outcome,
+                      "days_to_resolution": days_to_resolution})
+        return True
+
+    def all(self) -> list[DecisionRecord]:
+        with self._lock:
+            cur = self._conn.cursor()
+            cur.execute(f'SELECT "MEM_TYPE","PAYLOAD" FROM {self._qt()}')
+            rows = cur.fetchall()
+            cur.close()
+        decisions: dict[str, DecisionRecord] = {}
+        outcomes: list[dict] = []
+        for mem_type, payload_json in rows:
+            payload = json.loads(payload_json) if payload_json else {}
+            if mem_type == "outcome":
+                outcomes.append(payload)
+            else:
+                try:
+                    rec = DecisionRecord(**payload)
+                except TypeError:
+                    continue
+                decisions[rec.record_id] = rec
+        for o in outcomes:
+            rec = decisions.get(o.get("record_id"))
+            if rec and not rec.resolution_outcome:
+                rec.resolution_outcome = o.get("resolution_outcome", "")
+                rec.days_to_resolution = o.get("days_to_resolution")
+        return list(decisions.values())
 
 
 # Process-wide store for the MVP. A durable HANA-backed store is injected at

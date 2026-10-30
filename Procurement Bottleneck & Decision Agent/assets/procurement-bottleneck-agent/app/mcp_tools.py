@@ -28,6 +28,8 @@ async def get_mcp_tools() -> list[tools.AgentTool]:
 
     mode = os.environ.get("SAP_MODE", "gateway").lower()
     log_event(logger, "load_tools", sap_mode=mode, status="ok")
-    if mode == "accelerator_hub":
+    # accelerator_hub (sandbox APIKey) and onprem (BTP Destination + Cloud Connector)
+    # are both backed by s4_client, which picks its transport from SAP_MODE.
+    if mode in ("accelerator_hub", "onprem"):
         return tools.build_accelerator_hub_tools()
     return tools.build_live_tools(mode)

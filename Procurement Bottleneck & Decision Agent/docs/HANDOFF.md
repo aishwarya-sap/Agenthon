@@ -37,7 +37,7 @@ IBD_TESTING=1 python -m app     # serves on :8080
 - **Pending (tenant-dependent):** live S/4 on Adarsh's Tokyo landscape; IAS principal propagation
   (`AGENT_AUTH_MODE=ias`); turning off `ENABLE_WHOAMI`/`AGENT_AUTH_MODE=none` for production.
 
-## 5. Deploy (Cloud Foundry, us10-001 internal BAI dev)
+## 5. Deploy (Cloud Foundry, us10-001 internal dev)
 
 ```bash
 cd assets/procurement-bottleneck-agent

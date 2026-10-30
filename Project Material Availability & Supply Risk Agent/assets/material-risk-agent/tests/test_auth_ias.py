@@ -93,12 +93,14 @@ def test_decode_unverified_returns_safe_subset(keypair):
 
 # --- config: env-driven service-name profile (cloud API_* vs on-prem OP_*) ---
 def test_service_profile_cloud_vs_onprem(monkeypatch):
+    # Client on-prem S/4 exposes the standard API_* services (same names as cloud);
+    # only the transport differs (destination + Cloud Connector vs. sandbox APIKey).
     monkeypatch.setenv("S4_SERVICE_PROFILE", "cloud")
     assert config.s4_service("material_stock") == "API_MATERIAL_STOCK_SRV"
     assert config.s4_service("purchase_order") == "API_PURCHASEORDER_PROCESS_SRV"
     monkeypatch.setenv("S4_SERVICE_PROFILE", "onprem")
-    assert config.s4_service("material_stock") == "OP_API_MATERIAL_STOCK_SRV"
-    assert config.s4_service("purchase_order") == "OP_PURCHASEORDER_0001"
+    assert config.s4_service("material_stock") == "API_MATERIAL_STOCK_SRV"
+    assert config.s4_service("purchase_order") == "API_PURCHASEORDER_PROCESS_SRV"
 
 
 def test_auth_mode_mock_under_ibd_testing(monkeypatch):

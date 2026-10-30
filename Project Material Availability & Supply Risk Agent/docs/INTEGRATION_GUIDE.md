@@ -31,8 +31,8 @@ For the October 28 demo, steps 1–5 (CF deploy + chat UI) are sufficient to han
 
 1. Open [BTP Cockpit](https://cockpit.btp.cloud.sap)
 2. Navigate to your Global Account
-3. Either reuse an existing subaccount (e.g. `BAI-DEV`) or create a new one:
-   - **Region:** us10 (matches the BAI AI Core service key provided)
+3. Either reuse an existing subaccount (e.g. `DEV`) or create a new one:
+   - **Region:** us10 (matches our AI Core service key provided)
    - **Environment:** Cloud Foundry enabled
 4. In the subaccount, go to **Cloud Foundry → Spaces**
 5. Create a space called `AI-DEV` (or reuse if it exists)

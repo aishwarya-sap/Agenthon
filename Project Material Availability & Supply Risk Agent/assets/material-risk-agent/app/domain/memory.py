@@ -72,26 +72,134 @@ class MemoryStore:
             self._records.clear()
 
 
+def _hana_credentials() -> dict:
+    """Resolve HANA Cloud connection params from the bound 'hana' service (VCAP) or HANA_* env.
+
+    Expects host / port / user / password (+ optional schema) — the standard hdbcli
+    connection shape. Raises with guidance when nothing is bound/configured.
+    """
+    import json
+    import os
+
+    raw = os.environ.get("VCAP_SERVICES")
+    if raw:
+        try:
+            services = json.loads(raw)
+        except (ValueError, TypeError):
+            services = {}
+        for name in ("hana", "hanacloud"):
+            binds = services.get(name) or []
+            if binds:
+                c = binds[0].get("credentials") or {}
+                host = c.get("host") or c.get("hostname")
+                if host and c.get("user") and c.get("password"):
+                    return {
+                        "host": host,
+                        "port": int(c.get("port") or 443),
+                        "user": c["user"],
+                        "password": c["password"],
+                        "schema": c.get("schema") or config.HANA_SCHEMA or c["user"],
+                    }
+    # Fallback: explicit HANA_* env (local validation / cf set-env).
+    host = os.environ.get("HANA_HOST")
+    if host and os.environ.get("HANA_USER") and os.environ.get("HANA_PASSWORD"):
+        return {
+            "host": host,
+            "port": int(os.environ.get("HANA_PORT") or 443),
+            "user": os.environ["HANA_USER"],
+            "password": os.environ["HANA_PASSWORD"],
+            "schema": os.environ.get("HANA_SCHEMA") or os.environ["HANA_USER"],
+        }
+    raise RuntimeError(
+        "HANA Cloud is not configured. Bind a 'hana' service (host/user/password/schema) "
+        "to the CF app, or set HANA_HOST/HANA_USER/HANA_PASSWORD. "
+        "Create ZAGENT_DECISION_LOG first — see docs/hana/ZAGENT_DECISION_LOG.sql."
+    )
+
+
 class HanaMemoryStore(MemoryStore):
-    """PLACEHOLDER — durable HANA Cloud audit store for the decision/intervention log.
+    """Durable HANA Cloud audit store for the decision/intervention log.
 
-    Persists each record to ``<HANA_SCHEMA>.<HANA_DECISION_TABLE>`` (append-only, backed
-    by an INSERT/SELECT-only role) and uses the HANA Cloud Vector Engine
-    (``HANA_VECTOR_TABLE``) for semantic recall — behind this exact ``MemoryStore``
-    interface, so business logic and tests do not change.
+    Persists each record to ``<schema>.<HANA_DECISION_TABLE>`` (append-only — INSERT/SELECT
+    only, no update/delete) behind the same ``MemoryStore`` interface, so business logic
+    and tests are unchanged. Selected only when ``MEMORY_BACKEND=hana``. The free-text
+    payload is stored as JSON; ``HANA_VECTOR_TABLE`` (Vector Engine) semantic recall is a
+    later enhancement — recall here is attribute-filtered SELECT, same contract as in-memory.
 
-    Not wired yet: requires the ``hdbcli`` driver and a provisioned/bound HANA Cloud
-    instance. Selected only when ``MEMORY_BACKEND=hana``. See the data-readiness
-    questionnaire (docs/) for what the client must provision.
+    Requires the ``hdbcli`` driver and a provisioned/bound HANA Cloud instance. Create the
+    table with docs/hana/ZAGENT_DECISION_LOG.sql.
     """
 
-    def __init__(self) -> None:  # pragma: no cover - placeholder, not reachable in tests
-        raise NotImplementedError(
-            "HANA Cloud persistence is a placeholder. To enable MEMORY_BACKEND=hana: "
-            "provision HANA Cloud, create ZAGENT_DECISION_LOG (+ vector table) under a "
-            "schema with an INSERT/SELECT-only role, add the `hdbcli` dependency, and "
-            "implement record()/recall() against it. See docs/ (data-readiness §HANA Cloud)."
+    def __init__(self) -> None:
+        import threading as _threading
+
+        from hdbcli import dbapi  # lazy — only imported when MEMORY_BACKEND=hana
+
+        self._lock = _threading.Lock()
+        self._records = []  # unused; kept so inherited helpers never attribute-error
+        creds = _hana_credentials()
+        self._schema = creds["schema"]
+        self._table = config.HANA_DECISION_TABLE
+        self._conn = dbapi.connect(
+            address=creds["host"], port=creds["port"],
+            user=creds["user"], password=creds["password"],
+            encrypt=True, sslValidateCertificate=True, autocommit=True,
         )
+
+    def _qualified_table(self) -> str:
+        return f'"{self._schema}"."{self._table}"'
+
+    def record(self, mem_type: str, payload: dict) -> dict:
+        import json
+        import uuid
+        from datetime import datetime, timezone
+
+        if mem_type not in _TYPES:
+            raise ValueError(f"Unknown memory type: {mem_type}")
+        rec = {
+            "record_id": uuid.uuid4().hex[:12].upper(),
+            "mem_type": mem_type,
+            "created_utc": datetime.now(timezone.utc).isoformat(),
+            **payload,
+        }
+        with self._lock:
+            cur = self._conn.cursor()
+            cur.execute(
+                f'INSERT INTO {self._qualified_table()} '
+                '("RECORD_ID","MEM_TYPE","CREATED_UTC","VENDOR","MATERIAL","PAYLOAD") '
+                "VALUES (?,?,?,?,?,?)",
+                (rec["record_id"], mem_type, rec["created_utc"],
+                 str(payload.get("vendor") or ""), str(payload.get("material") or ""),
+                 json.dumps(payload)),
+            )
+            cur.close()
+        return dict(rec)
+
+    def recall(self, mem_type: str | None = None, **filters) -> list[dict]:
+        import json
+
+        sql = (f'SELECT "RECORD_ID","MEM_TYPE","CREATED_UTC","PAYLOAD" '
+               f'FROM {self._qualified_table()}')
+        params: list = []
+        if mem_type:
+            sql += ' WHERE "MEM_TYPE" = ?'
+            params.append(mem_type)
+        with self._lock:
+            cur = self._conn.cursor()
+            cur.execute(sql, params)
+            rows = cur.fetchall()
+            cur.close()
+        out: list[dict] = []
+        for record_id, mt, created_utc, payload_json in rows:
+            payload = json.loads(payload_json) if payload_json else {}
+            rec = {"record_id": record_id, "mem_type": mt,
+                   "created_utc": created_utc, **payload}
+            if all(rec.get(k) == v for k, v in filters.items()):
+                out.append(rec)
+        return out
+
+    def clear(self) -> None:  # append-only: no delete in production
+        raise NotImplementedError("HANA audit store is append-only; clear() is disabled.")
 
 
 _STORE: MemoryStore | None = None

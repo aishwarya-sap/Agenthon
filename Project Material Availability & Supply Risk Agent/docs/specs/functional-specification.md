@@ -6,7 +6,7 @@
 
 | Version | Date | Author | Change |
 |---|---|---|---|
-| 1.0 | 2026-10-26 | BAI Team | Initial functional specification |
+| 1.0 | 2026-10-26 | Delivery Team | Initial functional specification |
 
 ### 1.2 References
 
@@ -124,9 +124,9 @@ CF app (1 GB), single process; health check `/.well-known/agent-card.json`. Stan
 
 | Item | Risk | Owner | Due |
 |---|---|---|---|
-| IAS principal propagation | High — blocks Joule registration | IAS admin / BAI | Before Joule go-live |
+| IAS principal propagation | High — blocks Joule registration | IAS admin / our environment | Before Joule go-live |
 | Live S/4 connectivity (on-prem) | High — blocks live client data | Client Basis | Before live cutover |
-| HANA-backed memory (currently in-process) | Medium | BAI | Pre-production |
+| HANA-backed memory (currently in-process) | Medium | our environment | Pre-production |
 | Model benchmarking / live RagEval | Medium — tenant AI Core | AI governance | Pre-production |
 
 ## 9. Test Plan (Business Test Conditions)

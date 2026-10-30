@@ -1,6 +1,6 @@
 """Live S/4HANA OData reads via the SAP Business Accelerator Hub (APIKey).
 
-Used by `SAP_MODE=accelerator_hub` for the BAI end-to-end run against the sandbox's
+Used by `SAP_MODE=accelerator_hub` for our end-to-end run against the sandbox's
 S/4HANA Cloud `API_*` services. Field mappings were verified against each service's
 `$metadata` (see ADARSH_AGENTHON_REFERENCE.md §5.2). Service names are env-overridable
 so the same code targets Adarsh's on-prem `OP_*` services in the client landscape.
@@ -12,8 +12,10 @@ these APIs and stays on the mock/Excel project adapter.
 """
 from __future__ import annotations
 
+import json
 import os
 import re
+import time
 from datetime import date, datetime, timezone
 from typing import Any
 
@@ -30,6 +32,131 @@ def _base() -> str:
 
 def _headers() -> dict[str, str]:
     return {"APIKey": os.environ.get("S4_API_KEY", ""), "Accept": "application/json"}
+
+
+# ---------------------------------------------------------------------------
+# On-prem transport — BTP Destination + Cloud Connector (SAP_MODE=onprem).
+# ACTIVE: BasicAuthentication (tech user) over ProxyType OnPremise. The Destination
+#   Service returns a ready Authorization: Basic header; the request is routed via the
+#   Connectivity Proxy (bound 'connectivity' service) with a Proxy-Authorization bearer.
+# PLACEHOLDER (future): PrincipalPropagation — forward the user's IAS JWT as
+#   X-user-token so the destination exchanges it; switch is destination-side only.
+# The APIKey (accelerator_hub) path above is unchanged.
+# ---------------------------------------------------------------------------
+_S4_DESTINATION = os.environ.get("S4_DESTINATION", "S4HANA_DEV_HTTP")
+_ONPREM_CTX: dict | None = None
+_ONPREM_CTX_EXP: float = 0.0
+
+
+def _mode() -> str:
+    return os.environ.get("SAP_MODE", "").strip().lower()
+
+
+def _vcap(name: str) -> list:
+    try:
+        services = json.loads(os.environ.get("VCAP_SERVICES", "{}"))
+    except (ValueError, TypeError):
+        return []
+    return services.get(name) or []
+
+
+def clear_onprem_cache() -> None:
+    """Flush the resolved-destination cache (used in tests)."""
+    global _ONPREM_CTX, _ONPREM_CTX_EXP
+    _ONPREM_CTX, _ONPREM_CTX_EXP = None, 0.0
+
+
+async def _token(client: httpx.AsyncClient, token_url: str, cid: str, sec: str) -> str:
+    resp = await client.post(
+        token_url,
+        data={"grant_type": "client_credentials", "client_id": cid, "client_secret": sec},
+    )
+    resp.raise_for_status()
+    return resp.json()["access_token"]
+
+
+async def _resolve_onprem_ctx(user_token: str | None = None) -> dict:
+    """Resolve S4_DESTINATION → {base_url, auth_header, proxy_url, proxy_token, sap_client}.
+
+    Cached for ~1h. ``user_token`` (IAS JWT) is forwarded as X-user-token — harmless for
+    BasicAuthentication, and the hook for a future PrincipalPropagation switch.
+    """
+    global _ONPREM_CTX, _ONPREM_CTX_EXP
+    if _ONPREM_CTX and time.time() < _ONPREM_CTX_EXP:
+        return _ONPREM_CTX
+
+    dest_binds = _vcap("destination")
+    if not dest_binds:
+        raise RuntimeError(
+            "SAP_MODE=onprem but no 'destination' service is bound. "
+            "Bind the destination service instance to this CF app."
+        )
+    dc = dest_binds[0]["credentials"]
+    async with httpx.AsyncClient(timeout=15) as c:
+        tok = await _token(c, dc["url"].rstrip("/") + "/oauth/token", dc["clientid"], dc["clientsecret"])
+        headers = {"Authorization": f"Bearer {tok}"}
+        if user_token:
+            headers["X-user-token"] = user_token
+        body = (await c.get(
+            f"{dc['uri'].rstrip('/')}/destination-configuration/v1/destinations/{_S4_DESTINATION}",
+            headers=headers,
+        )).json()
+
+    cfg = body.get("destinationConfiguration", {})
+    base_url = cfg.get("URL", "").rstrip("/")
+    if not base_url:
+        raise RuntimeError(f"Destination '{_S4_DESTINATION}' has no URL configured.")
+    proxy_type = (cfg.get("ProxyType") or "Internet").strip()
+    sap_client = cfg.get("sap-client") or os.environ.get("S4_SAP_CLIENT", "150")
+
+    auth_header: str | None = None
+    auth_tokens = body.get("authTokens") or []
+    if auth_tokens:
+        t = auth_tokens[0]
+        if t.get("error"):
+            raise RuntimeError(f"Destination '{_S4_DESTINATION}' auth error: {t['error']}")
+        hh = t.get("http_header") or {}
+        auth_header = hh.get("value") or (
+            f"{t.get('type', 'Bearer')} {t['value']}" if t.get("value") else None)
+    if auth_header is None and cfg.get("User") and cfg.get("Password"):
+        import base64 as _b64
+        auth_header = "Basic " + _b64.b64encode(
+            f"{cfg['User']}:{cfg['Password']}".encode()).decode()
+
+    proxy_url: str | None = None
+    proxy_token: str | None = None
+    if proxy_type.lower() == "onpremise":
+        conn = _vcap("connectivity")
+        if not conn:
+            raise RuntimeError(
+                f"Destination '{_S4_DESTINATION}' is OnPremise but no 'connectivity' "
+                "service is bound. Bind the connectivity service to this CF app."
+            )
+        cc = conn[0]["credentials"]
+        turl = cc.get("token_service_url") or (cc["url"].rstrip("/") + "/oauth/token")
+        async with httpx.AsyncClient(timeout=10) as c2:
+            proxy_token = await _token(c2, turl, cc["clientid"], cc["clientsecret"])
+        proxy_url = f"http://{cc['onpremise_proxy_host']}:{cc['onpremise_proxy_port']}"
+
+    _ONPREM_CTX = {"base_url": base_url, "auth_header": auth_header,
+                   "proxy_url": proxy_url, "proxy_token": proxy_token, "sap_client": sap_client}
+    _ONPREM_CTX_EXP = time.time() + 3600
+    return _ONPREM_CTX
+
+
+def _parse_resp(resp: httpx.Response) -> list[dict[str, Any]]:
+    if resp.status_code >= 400:
+        # The BAH sandbox returns rate-limit/quota violations as HTTP 500 with a
+        # fault body, not 429 — detect it so the resilience layer treats it as a
+        # terminal quota error (no pointless retries that burn more quota).
+        body = (resp.text or "")[:500].lower()
+        if resp.status_code == 429 or "quotaviolation" in body or "rate limit" in body:
+            raise QuotaExceeded()
+        raise classify_http_status(resp.status_code)
+    d = resp.json().get("d", {})
+    if isinstance(d, dict) and "results" in d:
+        return d["results"]
+    return [d] if d else []
 
 
 def _svc(env_name: str, default: str) -> str:
@@ -56,20 +183,32 @@ def _days_since(iso: str) -> int:
 async def _get(client: httpx.AsyncClient, service: str, entityset: str,
                params: dict[str, Any]) -> list[dict[str, Any]]:
     params.setdefault("$format", "json")
+
+    if _mode() == "onprem":
+        # On-prem via BTP Destination + Cloud Connector; the passed APIKey client is
+        # not used here (a proxy-configured client is created for the routed request).
+        ctx = await _resolve_onprem_ctx()
+        if ctx["sap_client"]:
+            params.setdefault("sap-client", ctx["sap_client"])
+        url = f"{ctx['base_url']}/sap/opu/odata/sap/{service}/{entityset}"
+        headers = {"Accept": "application/json"}
+        if ctx["auth_header"]:
+            headers["Authorization"] = ctx["auth_header"]
+        if ctx["proxy_url"]:
+            headers["Proxy-Authorization"] = f"Bearer {ctx['proxy_token']}"
+            location_id = os.environ.get("S4_SCC_LOCATION_ID")
+            if location_id:
+                headers["SAP-Connectivity-SCC-Location-ID"] = location_id
+            async with httpx.AsyncClient(timeout=30, proxy=ctx["proxy_url"]) as pc:
+                resp = await pc.get(url, params=params, headers=headers)
+        else:
+            resp = await client.get(url, params=params, headers=headers)
+        return _parse_resp(resp)
+
+    # Accelerator Hub (APIKey) — unchanged.
     url = f"{_base()}/{service}/{entityset}"
     resp = await client.get(url, params=params, headers=_headers())
-    if resp.status_code >= 400:
-        # The BAH sandbox returns rate-limit/quota violations as HTTP 500 with a
-        # fault body, not 429 — detect it so the resilience layer treats it as a
-        # terminal quota error (no pointless retries that burn more quota).
-        body = (resp.text or "")[:500].lower()
-        if resp.status_code == 429 or "quotaviolation" in body or "rate limit" in body:
-            raise QuotaExceeded()
-        raise classify_http_status(resp.status_code)
-    d = resp.json().get("d", {})
-    if isinstance(d, dict) and "results" in d:
-        return d["results"]
-    return [d] if d else []
+    return _parse_resp(resp)
 
 
 # --- tool implementations (names match the agent's tool set) ----------------

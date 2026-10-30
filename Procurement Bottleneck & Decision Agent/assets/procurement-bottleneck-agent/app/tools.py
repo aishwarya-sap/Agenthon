@@ -201,7 +201,7 @@ def build_mock_tools() -> list[AgentTool]:
 
 
 def build_accelerator_hub_tools() -> list[AgentTool]:
-    """BAI end-to-end: real S/4 reads via the SAP Business Accelerator Hub (APIKey).
+    """our environment end-to-end: real S/4 reads via the SAP Business Accelerator Hub (APIKey).
 
     All 8 MCP tools are wired: 5 backed by live OData (s4_client); 3 that have no
     BAH sandbox equivalent (Project System WBS, HANA Vector RAG, approval workflow)

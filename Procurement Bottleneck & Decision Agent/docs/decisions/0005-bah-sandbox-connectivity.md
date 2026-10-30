@@ -4,12 +4,12 @@
 - **Date:** 2026-10-27
 
 ## Context
-The BAI end-to-end test reads live S/4 data through the SAP Business Accelerator Hub sandbox
+The our environment end-to-end test reads live S/4 data through the SAP Business Accelerator Hub sandbox
 (`SAP_MODE=accelerator_hub`, APIKey auth, OData V2). Heavy testing exhausted the sandbox quota and
 reads began failing.
 
 ## Decision
-- Use the BAH sandbox S/4HANA Cloud `API_*` services for the BAI test phase; the client landscape
+- Use the BAH sandbox S/4HANA Cloud `API_*` services for our test phase; the client landscape
   overrides these with its on-prem `OP_*` service names (config-driven per environment).
 - The sandbox returns quota violations as **HTTP 500 with a `QuotaViolation` fault body**, not 429.
   Detect that body in `s4_client._get` and raise `QuotaExceeded` (terminal, non-retryable) so the

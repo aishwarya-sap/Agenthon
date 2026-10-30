@@ -5,7 +5,7 @@ from the environment / .env (git-ignored) / CF VCAP_SERVICES — never committed
 
 This module centralises the two cross-cutting concerns the handoff brief calls
 out: the inbound-identity mode (mock | ias | xsuaa) at the A2A boundary, and the
-S/4 connectivity mode + env-specific OData service names (cloud API_* for the BAI
+S/4 connectivity mode + env-specific OData service names (cloud API_* for our
 sandbox; on-prem OP_* for the Adarsh tenant).
 """
 from __future__ import annotations
@@ -70,7 +70,7 @@ def whoami_enabled() -> bool:
 
 # --- S/4 connectivity + env-specific OData service names --------------------
 # The sandbox APIKey resolves S/4HANA Cloud `API_*` services (200); the on-prem
-# `OP_*` names 403 there. So BAI test = cloud, Adarsh prod = on-prem. Make the
+# `OP_*` names 403 there. So our environment test = cloud, Adarsh prod = on-prem. Make the
 # names config-driven: S4_SERVICE_PROFILE = cloud | onprem (default cloud).
 #
 # Field names are IDENTICAL between the two profiles for the entities we read;
@@ -86,16 +86,25 @@ _SERVICE_NAMES = {
         "info_record": "API_INFORECORD_PROCESS_SRV",
         "purchase_contract": "API_PURCHASECONTRACT_PROCESS_SRV",
     },
+    # Adarsh on-prem S/4 exposes the standard API_* OData services (client-confirmed
+    # service list, 2026-10), activated in /IWFND/MAINT_SERVICE and reached via the
+    # S4HANA_DEV_HTTP destination + Cloud Connector. Same names as cloud; only the
+    # transport differs (destination + connectivity proxy vs. Accelerator Hub APIKey).
     "onprem": {
-        "material_stock": "OP_API_MATERIAL_STOCK_SRV",
-        "material_document": "OP_API_MATERIAL_DOCUMENT_SRV",
-        "purchase_order": "OP_PURCHASEORDER_0001",
-        "purchase_requisition": "OP_PURCHASEREQUISITION_0001",
-        "business_partner": "OP_API_BUSINESS_PARTNER_SRV",
-        "info_record": "OP_API_INFORECORD_PROCESS_SRV_0001",
-        "purchase_contract": "OP_PPS_PURCHASECONTRACT_0001",
+        "material_stock": "API_MATERIAL_STOCK_SRV",
+        "material_document": "API_MATERIAL_DOCUMENT_SRV",
+        "purchase_order": "API_PURCHASEORDER_PROCESS_SRV",
+        "purchase_requisition": "API_PURCHASEREQ_PROCESS_SRV",
+        "business_partner": "API_BUSINESS_PARTNER",
+        "info_record": "API_INFORECORD_PROCESS_SRV",
+        "purchase_contract": "API_PURCHASECONTRACT_PROCESS_SRV",
     },
 }
+
+
+def s4_sap_client() -> str:
+    """S/4 client number sent with on-prem OData calls (destination sap-client=150)."""
+    return os.environ.get("S4_SAP_CLIENT", "150")
 
 
 def s4_service_profile() -> str:

@@ -17,8 +17,8 @@ modules:
       health-check-http-endpoint: /.well-known/agent-card.json
     build-parameters:
       builder: custom
-      # Do NOT pip-install locally: the CF python_buildpack installs requirements.txt at
-      # staging using the runtime.txt-pinned Python.
+      # CF python_buildpack installs requirements.txt at staging using the
+      # runtime.txt-pinned Python. Do not pip-install locally.
       commands:
         - echo "deps installed by CF python_buildpack from requirements.txt at staging"
       build-result: .
@@ -28,20 +28,56 @@ modules:
       AGENT_MODEL: sap/anthropic--claude-4.5-sonnet
       AGENT_MODEL_FALLBACK: sap/anthropic--claude-4.5-haiku
       AICORE_RESOURCE_GROUP: default
-      SAP_MODE: accelerator_hub
       PROJECT_DATA_SOURCE: SAP_PS
-      # AI Core credentials come from the bound aicore-creds service (VCAP_SERVICES),
-      # not from env vars. See resources section below.
+      # On-prem S/4 via BTP Destination + Cloud Connector (BasicAuthentication).
+      SAP_MODE: onprem
+      S4_DESTINATION: S4HANA_DEV_HTTP
+      S4_SAP_CLIENT: "150"
+      # Decision persistence defaults to in-process; flip to hana after provisioning
+      # HANA Cloud + running docs/hana/ZAGENT_DECISION_LOG.sql, and bind the hana service.
+      MEMORY_BACKEND: in_memory
+      # Inbound identity: set AGENT_AUTH_MODE=ias + IAS_* via scripts/setup-ias-env.sh
+      # once the Joule IAS apps are wired. No secrets here — all creds come from the
+      # bound services below (VCAP_SERVICES) and the BTP destination.
     requires:
-      - name: aicore-creds
+      - name: procurement-aicore
+      - name: procurement-destination
+      - name: procurement-connectivity
+      - name: procurement-xsuaa
+      # Bind HANA only when MEMORY_BACKEND=hana (uncomment + create the resource below):
+      # - name: procurement-hana
 
 resources:
-  # Shared AI Core credentials — created once, reused across agents.
-  # Create with: cf create-user-provided-service aicore-creds -p \
-  #   '{"AICORE_CLIENT_ID":"<id>","AICORE_CLIENT_SECRET":"<secret>",
-  #     "AICORE_AUTH_URL":"<auth-url>","AICORE_BASE_URL":"<base-url>"}'
-  # `existing-service` references it without owning it — undeploy never deletes it.
-  - name: aicore-creds
-    type: org.cloudfoundry.existing-service
+  # SAP AI Core — LLM via Generative AI Hub. main.py maps the binding's
+  # clientid/clientsecret/url/serviceurls.AI_API_URL into AICORE_* at startup.
+  - name: procurement-aicore
+    type: org.cloudfoundry.managed-service
     parameters:
-      service-name: aicore-creds
+      service: aicore
+      service-plan: extended
+  # BTP Destination Service — resolves S4HANA_DEV_HTTP at runtime (no creds in repo).
+  - name: procurement-destination
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: destination
+      service-plan: lite
+  # Connectivity Service — Cloud Connector proxy for the on-prem S/4 destination.
+  - name: procurement-connectivity
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: connectivity
+      service-plan: lite
+  # XSUAA — secures the agent's HTTP endpoints (xs-security.json).
+  - name: procurement-xsuaa
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: xsuaa
+      service-plan: application
+      path: ./assets/procurement-bottleneck-agent/xs-security.json
+  # HANA Cloud — durable decision/approval audit (optional; enable with MEMORY_BACKEND=hana).
+  # Uncomment and bind in the agent module's requires when provisioning HANA.
+  # - name: procurement-hana
+  #   type: org.cloudfoundry.managed-service
+  #   parameters:
+  #     service: hana
+  #     service-plan: hdi-shared

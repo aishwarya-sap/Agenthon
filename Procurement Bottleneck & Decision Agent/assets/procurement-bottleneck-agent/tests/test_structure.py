@@ -14,7 +14,7 @@ def test_required_files_present():
                 "app/tools.py", "app/skills.py", "app/simulation.py", "app/memory.py",
                 "app/hitl.py", "app/project_data.py", "app/config.py", "app/observability.py",
                 "app/resilience.py", "app/agent_card.py", "mcp-mock.json", "asset.yaml",
-                "manifest.yml", "xs-security.json", ".env.example", "demo/index.html"]:
+                "manifest.yml", "xs-security.json", "demo/index.html"]:
         assert os.path.exists(os.path.join(ASSET_ROOT, rel)), f"missing {rel}"
 
 

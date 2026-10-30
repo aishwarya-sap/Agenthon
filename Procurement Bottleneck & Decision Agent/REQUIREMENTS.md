@@ -1,6 +1,6 @@
 # Requirements — Adarsh Developers Procurement Bottleneck Agent
 
-**Version:** 1.0 | **Date:** 2026-10-17 | **Author:** BAI Team
+**Version:** 1.0 | **Date:** 2026-10-17 | **Author:** Delivery Team
 
 ---
 
@@ -100,8 +100,8 @@ Permitted side effects (after explicit HITL approval only):
 
 | Item | Risk | Owner | Due |
 |---|---|---|---|
-| IAS App2App configuration | High — blocks Joule integration | Adarsh IAS admin / BAI | Sprint 3 start |
+| IAS App2App configuration | High — blocks Joule integration | Adarsh IAS admin / our environment | Sprint 3 start |
 | Cloud Connector setup | High — blocks live S/4 data | Adarsh Basis | Sprint 2 end |
 | OData entity set name verification | Medium — naming varies by release | Adarsh Basis (`/IWFND/MAINT_SERVICE`) | Sprint 2 start |
-| Token cost actuals vs forecast | Medium — confirm via LLM Calculator | BAI | Sprint 3 |
+| Token cost actuals vs forecast | Medium — confirm via LLM Calculator | our environment | Sprint 3 |
 | Legal/DPO classification (EU AI Act) | Low for demo; Medium for production | Adarsh Legal | Sprint 4 |

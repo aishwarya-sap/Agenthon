@@ -26,13 +26,6 @@ import json
 import os
 from pathlib import Path
 
-# dotenv is optional locally; VCAP provides vars in CF.
-try:
-    from dotenv import load_dotenv
-    load_dotenv(Path(__file__).parent.parent / ".env", override=False)
-except Exception:
-    pass
-
 # Map bound CF service credentials into the environment before importing the agent.
 _vcap = os.environ.get("VCAP_SERVICES")
 if _vcap:
@@ -67,7 +60,7 @@ async def s4_canary_read(user_jwt: str | None) -> dict:
     """Diagnostic canary: prove the agent can reach S/4 as the propagated user.
 
     Wired to the live S/4 read path once the connectivity target (SAP Business
-    Accelerator Hub sandbox for BAI, or the principal-propagation Destination for
+    Accelerator Hub sandbox for our environment, or the principal-propagation Destination for
     Joule) is configured. Until then it reports the intended mode so /whoami still
     shows the first four hops of the chain.
     """

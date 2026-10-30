@@ -2,7 +2,7 @@
 
 The compiled graph has one node that invokes the agent's existing `handle()` — the
 deterministic intent-routing + LLM-reasoning turn is unchanged. The graph adds the
-standard scaffolding the GDH template expects:
+standard scaffolding the standard template expects:
 
 - typed `TurnState`,
 - an in-memory checkpointer keyed by the Joule Context ID (thread_id),

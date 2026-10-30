@@ -7,7 +7,7 @@ Usage:
 
 These tests are intentionally excluded from the main offline suite (pytest.ini
 addopts does not include this folder). They exist to verify the deployed app
-on any landscape — BAI or client — without re-running the full unit suite.
+on any landscape — our environment or client — without re-running the full unit suite.
 """
 import os
 import uuid

@@ -1,7 +1,7 @@
-# SAP A2A Agent — Default Repo (Sprint 1 Template)
+# Default Repo — Agent Starter Template
 
-Generic, reusable scaffold for any SAP A2A agent engagement.
-Share this repo with the client at the start of Sprint 1.
+Generic, reusable scaffold for any SAP A2A agent engagement. Share this repo with the
+client as the starting point for their build.
 
 ---
 
@@ -10,96 +10,82 @@ Share this repo with the client at the start of Sprint 1.
 ```
 default-repo/
 ├── assets/agent-starter-kit/         ← Python A2A agent (rename to your agent name)
-├── assets/agent-starter-kit-ui/      ← Joule-style chat UI
+├── assets/agent-starter-kit-ui/      ← chat UI
 ├── governance/
-│   ├── agent_checklist_L0_to_L10.md   ← governance checklist
-│   └── sprint_checklist_stage0_to_8.md ← Engineering build checklist
+│   └── agent_checklist_L0_to_L10.md   ← governance checklist
 ├── docs/
 │   ├── data_readiness_questionnaire.md
-│   └── client_sprint1_email.md
+│   └── client_kickoff_email.md
 ├── manifest.yml                 ← CF deployment (parameterized)
-├── deploy.sh                    ← CF push helper (prompts for domain)
-└── sonar-project.properties
+└── deploy.sh                    ← CF push helper (prompts for domain)
 ```
 
 ---
 
-## Quickstart (Sprint 1 — mock mode)
+## Run locally (mock mode)
 
 ```bash
-# 1. Copy and fill in your credentials
-cp assets/agent-starter-kit/.env.example assets/agent-starter-kit/.env
-# Edit .env: set AICORE_* values
-
-# 2. Install dependencies (Python 3.11+)
+# Install dependencies (Python 3.11+)
 cd assets/agent-starter-kit
 pip install -r requirements.txt
 
-# 3. Run locally (fully offline, mock data)
+# Run fully offline on mock data — no credentials needed
 IBD_TESTING=1 python app/_boot.py
 
-# 4. Run smoke tests
+# Run smoke tests
 IBD_TESTING=1 pytest tests/test_smoke.py -v
 ```
+
+Configuration is read from the process environment; credentials come from bound CF
+service instances (`VCAP_SERVICES`) / BTP Destinations, never a committed file.
 
 ---
 
 ## Deploy to Cloud Foundry
 
 ```bash
-# From the default-repo/ root:
+# From the default-repo/ root (prompts for your CF domain):
 ./deploy.sh
-# You will be prompted for your CF domain.
-```
 
-Or manually:
-```bash
-CF_APP_DOMAIN=cfapps.ap20.hana.ondemand.com cf push -f manifest.yml
+# Or manually:
+CF_APP_DOMAIN=cfapps.<region>.hana.ondemand.com cf push -f manifest.yml
 ```
 
 ---
 
-## Customise for your domain (Sprint 2)
+## Customise for your domain
 
-1. Rename `assets/agent-starter-kit/` to your agent name (update `manifest.yml` to match)
-2. Edit `assets/agent-starter-kit/app/agent.py` → replace the `[Agent Name]` and workflow section in `get_system_prompt()`
-3. Replace `mcp-mock.json` with your domain's mock tool responses
-4. Add real tools in `assets/agent-starter-kit/app/mcp_providers/agw.py` (IBD_LIVE_S4 branch)
-5. Update `manifest.yml` agent/UI app names
+- Rename `assets/agent-starter-kit/` to your agent name (update `manifest.yml` to match)
+- Edit `assets/agent-starter-kit/app/agent.py` → replace the agent name and workflow in `get_system_prompt()`
+- Replace `mcp-mock.json` with your domain's mock tool responses
+- Add real tools in `assets/agent-starter-kit/app/mcp_providers/agw.py`
+- Update `manifest.yml` agent/UI app names
 
 ---
 
-## Persistence — recommendations & approvals (Sprint 4)
+## Persistence — recommendations & approvals
 
-The agent persists its recommendations and approvals to an **append-only** backend table on
-**HANA Cloud** (the audit trail), with the HANA Cloud **Vector Engine** for optional semantic recall
-of prior decisions. Selected via `MEMORY_BACKEND` in `.env` (default `in_memory` for Sprint 1 mock):
+The agent persists its recommendations and approvals to an **append-only** table on
+**HANA Cloud** (the audit trail), with the HANA Cloud **Vector Engine** for optional
+semantic recall. Selected via the `MEMORY_BACKEND` environment variable (default `in_memory`):
 
-```bash
-MEMORY_BACKEND=in_memory    # Sprint 1/2 — in-process store (mock, tests)
-# MEMORY_BACKEND=hana       # Sprint 4 — durable HANA Cloud audit table (ZAGENT_DECISION_LOG)
-```
+- `MEMORY_BACKEND=in_memory` — in-process store (mock, tests)
+- `MEMORY_BACKEND=hana` — durable HANA Cloud audit table (`ZAGENT_DECISION_LOG`)
 
-**Seam pattern:** keep one `MemoryStore` interface (`append()` / `recall()`); implement a
-`HanaMemoryStore` behind the same interface and select it when `MEMORY_BACKEND=hana`. Business logic
-and tests do not change. Use a technical user with an **INSERT/SELECT-only** role (append-only audit).
-On CF, bind a HANA (HDI-container / schema) service — credentials arrive via `VCAP_SERVICES`, never in
-env. See `docs/data_readiness_questionnaire.md` §HANA Cloud for what to request from the client.
+**Seam pattern:** one `MemoryStore` interface (`append()` / `recall()`); a `HanaMemoryStore`
+behind the same interface, selected when `MEMORY_BACKEND=hana`. Business logic and tests do
+not change. Use a technical user with an **INSERT/SELECT-only** role (append-only audit). On CF,
+bind a HANA (HDI-container / schema) service — credentials arrive via `VCAP_SERVICES`, never in a
+committed file. See `docs/data_readiness_questionnaire.md` for what to request from the client.
 
 ---
 
 ## Governance
 
-Review the [Agent Checklist](governance/agent_checklist_L0_to_L10.md) at the end of each sprint.
-Review the [Engineering Checklist](governance/sprint_checklist_stage0_to_8.md) before each deployment.
+Review the [Agent Checklist](governance/agent_checklist_L0_to_L10.md) periodically through the build.
 
----
-
-## Cookbook reference
-
-This scaffold follows the **SAP  / Custom-Agentic-Solutions-CoE** cookbook.
 Mandatory rules enforced:
 - Exactly 3 `@agent_*` decorators in `agent.py`
 - 6 MANDATORY RULES in every system prompt (incl. `top=100` and financial disclaimer)
 - `IBD_TESTING=1` mock mode working before any live connectivity
-- `pytest` coverage ≥ 70% before Sprint 2
+- `pytest` coverage ≥ 70%

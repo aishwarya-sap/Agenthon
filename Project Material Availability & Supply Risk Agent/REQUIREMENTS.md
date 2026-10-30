@@ -1,6 +1,6 @@
 # Requirements — Project Material Availability & Supply Risk Agent
 
-**Version:** 1.0 | **Date:** 2026-10-26 | **Author:** BAI Team
+**Version:** 1.0 | **Date:** 2026-10-26 | **Author:** Delivery Team
 
 ---
 
@@ -92,7 +92,7 @@ Permitted side effects (after explicit HITL approval only): log an intervention-
 
 | Item | Risk | Owner | Due |
 |---|---|---|---|
-| IAS principal propagation | High — blocks Joule registration | IAS admin / BAI | Before Joule go-live |
+| IAS principal propagation | High — blocks Joule registration | IAS admin / our environment | Before Joule go-live |
 | Live S/4 connectivity (on-prem) | High — blocks live client data | Client Basis | Before live cutover |
 | Model benchmarking (L0-2) | Medium — tenant AI Core | AI governance | Pre-production |
 | Live RagEval (L0-3.3) | Medium — needs live corpus + gold set | AI governance | Pre-production |

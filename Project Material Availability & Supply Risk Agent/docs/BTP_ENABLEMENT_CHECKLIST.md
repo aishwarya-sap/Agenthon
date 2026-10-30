@@ -1,15 +1,15 @@
 # BTP Enablement Checklist — Material Availability & Supply Risk Agent (one pager)
 
-**Principle:** do every step in **BAI (our env) first and prove it**, then repeat the
+**Principle:** do every step in **our environment first and prove it**, then repeat the
 **identical** step in the **Adarsh** landscape. Only tenant URLs, the S/4 system, and
-hop-2 auth type differ. Tick BAI before touching Adarsh.
+hop-2 auth type differ. Tick our environment before touching Adarsh.
 
 Legend: `[ ]` to do · **Gate** = don't proceed until this passes · Owner in (brackets)
 
 ---
 
 ### Phase A — Agent + real data (no identity yet)
-- [ ] A1. `cf push -f manifest.yml` to the BAI CF space; `GET /.well-known/agent.json` returns the card. (us) **Gate: card resolves, protocolVersion 0.3.0.**
+- [ ] A1. `cf push -f manifest.yml` to our CF space; `GET /.well-known/agent.json` returns the card. (us) **Gate: card resolves, protocolVersion 0.3.0.**
 - [ ] A2. Set `IBD_LIVE_S4=1`, `S4_SERVICE_PROFILE=cloud`, `S4_BASE_URL`, `S4_API_KEY` (env only); run an analysis turn → report built from **real** sandbox data. (us) **Gate: real stock/PO/supplier data in the report.**
 - [ ] A3. The custom chat UI (`material-risk-ui`) is up so a functional consultant can click through the CF agent before Joule is ready. (us)
 - [ ] A4. Functional consultant signs off on the agent's output quality. (consultant)
@@ -25,7 +25,7 @@ Legend: `[ ]` to do · **Gate** = don't proceed until this passes · Owner in (b
 
 ### Phase C — S/4 as the user (hop 2)
 - [ ] C1. Bind `destination` + `connectivity` + `identity` service instances to the agent app. (BTP admin)
-- [ ] C2. Outbound destination to S/4: **public cloud → OAuth2SAMLBearerAssertion** (BAI) / **Adarsh on-prem → PrincipalPropagation + ProxyType=OnPremise via Cloud Connector**. `x_user_token.jwks_uri` set. (BTP admin)
+- [ ] C2. Outbound destination to S/4: **public cloud → OAuth2SAMLBearerAssertion** (our environment) / **Adarsh on-prem → PrincipalPropagation + ProxyType=OnPremise via Cloud Connector**. `x_user_token.jwks_uri` set. (BTP admin)
 - [ ] C3. (On-prem only) Cloud Connector principal propagation: system cert + trust, CA in STRUST, cert→user mapping rule, `icm/HTTPS/verify_client`, OData services active (`/IWFND/MAINT_SERVICE`). Switch agent to `S4_SERVICE_PROFILE=onprem`. (Basis + us)
 - [ ] C4. Demo users exist in the S/4 client (ADV client 100) with **emails matching their IAS logins**, and hold the read authorizations. (Basis)
 - [ ] C5. `/whoami` S/4 canary returns data; the S/4 access log shows the **human's** id, not a technical user. (us) **Gate: no `authTokens[0].error`; data filtered by the user's roles.**
@@ -46,7 +46,7 @@ Legend: `[ ]` to do · **Gate** = don't proceed until this passes · Owner in (b
 **What goes in the Adarsh confirmation mail = the prerequisites behind B1–B4, C2–C4** (IAS
 tenant+admin, Joule entitlement/A2A-in-region, roles/Booster, service instances, Cloud
 Connector principal propagation, OData activation, user email mapping, model-in-catalog,
-CF Space Developer). Send it only after Phases A–C pass in BAI, so we ask from experience.
+CF Space Developer). Send it only after Phases A–C pass in our environment, so we ask from experience.
 
 > **Adarsh handover gaps flagged (2026-10-20):** the handover listed infra only — no IAS
 > tenant, no BTP↔IAS trust, no Joule entitlement/instance/roles. The whole identity + Joule

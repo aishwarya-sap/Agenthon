@@ -46,7 +46,7 @@ def validate_identity(headers: dict[str, str]) -> str:
     if mode == "mock":
         return "mock-user"
     if mode == "none":
-        # DEV-ONLY inbound-auth bypass for BAI standalone testing BEFORE Joule/IAS is
+        # DEV-ONLY inbound-auth bypass for our environment standalone testing BEFORE Joule/IAS is
         # wired. Opt-in via AGENT_AUTH_MODE=none. NEVER enable in production.
         log_event(logger, "auth_bypass_DEV_ONLY", status="warning",
                   detail="AGENT_AUTH_MODE=none — inbound identity NOT validated")

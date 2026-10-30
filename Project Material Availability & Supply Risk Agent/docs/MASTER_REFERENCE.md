@@ -167,7 +167,7 @@ API key for Business Accelerator Hub sandbox: set in `.env` as `S4_API_KEY` (nev
 Sandbox base URL: `https://sandbox.api.sap.com/s4hanacloud/sap/opu/odata/sap`
 
 **Service names are config-driven** via `S4_SERVICE_PROFILE` (`config.s4_service()`):
-`cloud` → S/4HANA Cloud `API_*` (BAI sandbox); `onprem` → `OP_*` (Adarsh tenant). Field names are identical across profiles; only the service path differs.
+`cloud` → S/4HANA Cloud `API_*` (sandbox); `onprem` → `OP_*` (Adarsh tenant). Field names are identical across profiles; only the service path differs.
 
 All services are **OData V2** — collections under `d.results`, dates as `/Date(epochMillis)/` (parsed by `_parse_odata_date`). **All 7 verified reachable (HTTP 200) against the sandbox on 2026-10-21.**
 

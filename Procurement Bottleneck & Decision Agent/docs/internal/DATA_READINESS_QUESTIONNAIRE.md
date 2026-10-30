@@ -2,7 +2,7 @@
 
 **INTERNAL — send to client SPOC at Sprint 1 kickoff**  
 **Engagement:** [Client Name] — [Agent Name]  
-**Sent by:** BAI Team  
+**Sent by:** Delivery Team  
 **Due before Sprint 2 start**
 
 ---
@@ -82,8 +82,8 @@ For each OData service the agent uses, please confirm it is active in your syste
 | E1 | IAS tenant URL (e.g., `<tenant>.accounts.ondemand.com`) | |
 | E2 | Who is the IAS administrator for this tenant? | |
 | E3 | Is the "04 - Build Code with Joule" (or equivalent Joule-enabled) subaccount available? | |
-| E4 | Are you willing to grant BAI team the `Joule_Content_Manager` role in the Joule-enabled subaccount? | |
-| E5 | Is the `Cli2Joule` IAS App2App dependency already configured? (BAI will confirm this; just note if you know) | |
+| E4 | Are you willing to grant delivery team the `Joule_Content_Manager` role in the Joule-enabled subaccount? | |
+| E5 | Is the `Cli2Joule` IAS App2App dependency already configured? (our environment will confirm this; just note if you know) | |
 
 ---
 
@@ -107,14 +107,14 @@ with optional Vector Engine semantic recall. Confirm so this can be provisioned.
 
 | # | Item | Target date |
 |---|---|---|
-| F1 | Section A–B answers returned to BAI | |
+| F1 | Section A–B answers returned to our environment | |
 | F2 | Basis team activates missing OData services | |
 | F3 | Cloud Connector reachable from BTP DEV space | |
 | F4 | Sprint 2 kickoff call | |
 
 ---
 
-## What BAI will provide
+## What our environment will provide
 
 - Agent source code in `default-repo/` (shared via git) — ready to clone and `cf push`
 - CF app URL for functional SPOC testing (mock data, no SAP connection needed)
@@ -124,4 +124,4 @@ with optional Vector Engine semantic recall. Confirm so this can be provisioned.
 Please reply to this mail with the completed table, or share it as a comment in the project tracker.
 
 Thanks,  
-[BAI engagement lead]
+[our environment engagement lead]
