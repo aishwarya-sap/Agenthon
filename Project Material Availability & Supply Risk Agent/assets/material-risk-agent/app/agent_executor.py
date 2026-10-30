@@ -16,7 +16,7 @@ from a2a.utils.errors import ServerError
 
 from agent import SampleAgent
 from load_skill_resources import get_load_skill_resource_tool
-from mcp_providers.agw import get_mcp_tools
+from tool_provider.agw import get_mcp_tools
 from prompt_injection_detector import wrap_tool
 
 logger = logging.getLogger(__name__)

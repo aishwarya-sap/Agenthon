@@ -38,7 +38,7 @@ that plain CF lacks — and removes a whole deployable app.
    `schema.sql` at import **if the DB is absent** (`_ensure_seeded()`). This is the frozen
    contract between the data layer and the tools — agree signatures and return-dict shapes
    before parallel work starts.
-3. **`app/mcp_providers/<agent>_local_tools.py`** — in-process `StructuredTool`s whose
+3. **`app/tool_provider/<agent>_local_tools.py`** — in-process `StructuredTool`s whose
    coroutines call `store.py`. Reuse the existing `_build_mock_tools()` StructuredTool shape
    in `agw.py`, swapping static JSON for query results.
 4. **Flip the one wiring seam: `get_mcp_tools()`.** This function (in `agw.py`) is the
@@ -50,7 +50,7 @@ that plain CF lacks — and removes a whole deployable app.
    ```python
    def get_mcp_tools():
        if _ibd_testing_on():                      # demo: in-process SQLite tools
-           from mcp_providers.<agent>_local_tools import get_local_tools
+           from tool_provider.<agent>_local_tools import get_local_tools
            return get_local_tools()
        ...                                        # production: Agent Gateway (unchanged)
    ```
@@ -78,7 +78,7 @@ suite only resolves with `app/` on `PYTHONPATH`. Run from the agent dir:
 PYTHONPATH="$(pwd)/app" python -m pytest tests/ -q     # from assets/<agent>/
 ```
 
-`db/` and `mcp_providers/` therefore import as top-level (`import store`, `from db import
+`db/` and `tool_provider/` therefore import as top-level (`import store`, `from db import
 calculations`), not `app.db.*`. `store.py` is a module-level singleton seeded at first import,
 so tests that need an isolated temp DB must **defer their imports into the test body** rather
 than importing `store` / the local tools at module top (a module-top import races whichever

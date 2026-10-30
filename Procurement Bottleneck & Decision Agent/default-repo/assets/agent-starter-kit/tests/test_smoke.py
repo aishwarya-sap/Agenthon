@@ -23,9 +23,9 @@ def test_agent_card_is_importable():
 
 
 def test_mock_tools_load():
-    """mcp_providers/agw.py returns at least one mock tool when IBD_TESTING=1."""
+    """tool_provider/agw.py returns at least one mock tool when IBD_TESTING=1."""
     import asyncio
-    from app.mcp_providers.agw import get_mcp_tools
+    from app.tool_provider.agw import get_mcp_tools
     tools = asyncio.run(get_mcp_tools())
     assert len(tools) >= 1
     assert all(hasattr(t, "name") for t in tools)

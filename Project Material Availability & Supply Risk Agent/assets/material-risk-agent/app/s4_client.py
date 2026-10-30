@@ -283,7 +283,7 @@ def _odata_get(service: str, entity: str, params: dict | None = None) -> list[di
         return cached
 
     if config.s4_service_profile() == "onprem":
-        from mcp_providers.agw import get_user_token
+        from tool_provider.agw import get_user_token
         user_token = get_user_token()
         ctx = _resolve_destination(S4_DESTINATION, user_token)
         # On-prem OData path; carry sap-client (destination sap-client=150).

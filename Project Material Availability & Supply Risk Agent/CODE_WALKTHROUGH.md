@@ -52,7 +52,7 @@ agent.py::SampleAgent.stream()
     ├── _invoke_with_fallback()           ← walk model chain, skip circuit-open models
     │   └── LangGraph create_agent (recursion_limit=15, SummarizationMiddleware @30k)
     │
-    ├── Tool calls via mcp_providers/agw.py::get_mcp_tools()
+    ├── Tool calls via tool_provider/agw.py::get_mcp_tools()
     │   ├── get_project_material_requirements / parse_excel_project_schedule
     │   ├── get_material_stock_position / get_open_purchase_orders_and_prs
     │   ├── get_consolidation_material_master
@@ -83,7 +83,7 @@ POST / response (JSON-RPC)
 All arithmetic — net availability, risk banding, schedule/cost simulation, delivery prediction — is **deterministic Python** in `domain/`, fully unit-testable offline. The LLM orchestrates tool calls and synthesises the final verdict; it relays tool numbers verbatim.
 
 ### 2. Three operating modes
-`mcp_providers/agw.py::get_mcp_tools()` dispatches on env: `IBD_TESTING=1` → in-process mock tools over seeded fixtures; `IBD_LIVE_S4=1` → real OData via `s4_client` (Accelerator Hub sandbox); neither → Agent Gateway MCP discovery (production). Tool names/shapes are identical across all three.
+`tool_provider/agw.py::get_mcp_tools()` dispatches on env: `IBD_TESTING=1` → in-process mock tools over seeded fixtures; `IBD_LIVE_S4=1` → real OData via `s4_client` (Accelerator Hub sandbox); neither → Agent Gateway MCP discovery (production). Tool names/shapes are identical across all three.
 
 ### 3. Context-overflow guards
 `s4_client` caps PO and PR reads at `$top=100` (an unfiltered query against a shared sandbox can otherwise return thousands of rows and overflow the context window), caches reads for 30s per `(service, entity, params)`, and runs blocking `httpx` in a thread-pool executor so a slow OData call never stalls the async loop. `recursion_limit=15` bounds the tool loop.

@@ -58,7 +58,7 @@ CF_APP_DOMAIN=cfapps.<region>.hana.ondemand.com cf push -f manifest.yml
 - Rename `assets/agent-starter-kit/` to your agent name (update `manifest.yml` to match)
 - Edit `assets/agent-starter-kit/app/agent.py` → replace the agent name and workflow in `get_system_prompt()`
 - Replace `mcp-mock.json` with your domain's mock tool responses
-- Add real tools in `assets/agent-starter-kit/app/mcp_providers/agw.py`
+- Add real tools in `assets/agent-starter-kit/app/tool_provider/agw.py`
 - Update `manifest.yml` agent/UI app names
 
 ---

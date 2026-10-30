@@ -207,7 +207,7 @@ def test_odata_get_onprem_basic_via_connectivity_proxy(monkeypatch):
     monkeypatch.setattr(httpx, "Client", _FakeClient)
     import unittest.mock as mock
     with mock.patch.dict("sys.modules",
-                         {"mcp_providers.agw": mock.MagicMock(get_user_token=lambda: "joule-jwt")}):
+                         {"tool_provider.agw": mock.MagicMock(get_user_token=lambda: "joule-jwt")}):
         rows = s4_client._odata_get("API_MATERIAL_STOCK_SRV", "A_MatlStkInAcctMod")
     cap = _FakeClient.captured
     assert rows == [{"Material": "RM-001"}]

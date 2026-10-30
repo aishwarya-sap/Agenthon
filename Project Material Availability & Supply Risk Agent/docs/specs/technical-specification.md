@@ -46,7 +46,7 @@ app/agent_executor.py  ←  IAS JWT validation (app/auth_ias.py)
         │
 app/agent.py  (LangChain create_agent + ChatLiteLLM, recursion_limit=15)
         │
-   15 tools via app/mcp_providers/agw.py
+   15 tools via app/tool_provider/agw.py
    ├── IBD_TESTING=1   → in-process mock (seeded Tower Alpha fixtures)
    ├── IBD_LIVE_S4=1   → direct OData (Accelerator Hub sandbox); live-first fallback to seeded data
    └── production      → Agent Gateway MCP discovery

@@ -27,7 +27,7 @@ except Exception:  # pragma: no cover
         return None
 
 from agent_executor import AgentExecutor
-from mcp_providers.agw import set_user_token, reset_user_token
+from tool_provider.agw import set_user_token, reset_user_token
 import config
 
 logging.basicConfig(level=logging.INFO)

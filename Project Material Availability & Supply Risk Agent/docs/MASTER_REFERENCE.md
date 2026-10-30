@@ -93,7 +93,7 @@ Project Material Availability & Supply Risk Agent/
 │   │   │   │   ├── memory.py    # Append-only institutional memory store
 │   │   │   │   ├── hitl.py      # HITL approval gate (keyword check + gate_write)
 │   │   │   │   └── sanitize.py  # RAG: injection scan + PII redaction + similarity gate
-│   │   │   ├── mcp_providers/
+│   │   │   ├── tool_provider/
 │   │   │   │   └── agw.py       # Tool provider: mock | live-S4 | Agent Gateway
 │   │   │   └── circuit_breaker.py  # LLM call circuit breaker (3 fails / 30s)
 │   │   ├── governance/          # 9 governance docs mapped to SAP BTP checklist

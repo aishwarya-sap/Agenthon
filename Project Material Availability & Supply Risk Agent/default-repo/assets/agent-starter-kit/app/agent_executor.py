@@ -8,7 +8,7 @@ from a2a.utils import new_agent_text_message, new_task
 from a2a.utils.errors import ServerError
 
 from agent import SampleAgent
-from mcp_providers.agw import get_mcp_tools
+from tool_provider.agw import get_mcp_tools
 
 logger = logging.getLogger(__name__)
 

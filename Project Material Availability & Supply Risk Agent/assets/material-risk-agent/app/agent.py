@@ -39,7 +39,7 @@ except Exception:  # pragma: no cover
 
 from circuit_breaker import CircuitBreaker
 from graph import build_graph, make_run_config
-from mcp_providers.agw import get_user_sub
+from tool_provider.agw import get_user_sub
 
 tracer = trace.get_tracer(__name__)
 logger = logging.getLogger(__name__)

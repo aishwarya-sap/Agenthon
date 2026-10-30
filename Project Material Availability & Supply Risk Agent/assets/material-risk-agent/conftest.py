@@ -1,7 +1,7 @@
 """Root conftest.py — fixtures and pytest plugin for the IBD agent test suite.
 
 When copied into /assets/<asset-name> this file:
-  - sets IBD_TESTING=1 so mcp_providers.agw.get_mcp_tools() returns mock tools from
+  - sets IBD_TESTING=1 so tool_provider.agw.get_mcp_tools() returns mock tools from
     mcp-mock.json instead of making real network calls
   - provides shared fixtures used by prebuilt_tests/ (agent path, server lifecycle)
   - registers custom markers
@@ -75,7 +75,7 @@ def add_agent_to_path(agent_app_path: Path):
     """Add app/ to sys.path so agent modules can be imported as peer-level imports.
 
     Only app/ is added because the runtime server (main.py) runs from inside app/,
-    making modules like ``agent``, ``mcp_providers``, ``tools`` etc. top-level names.
+    making modules like ``agent``, ``tool_provider``, ``tools`` etc. top-level names.
     Do NOT add the agent root — that would make ``from app.xxx import ...`` resolve
     during tests but fail at runtime where only app/ is on the path.
     """
