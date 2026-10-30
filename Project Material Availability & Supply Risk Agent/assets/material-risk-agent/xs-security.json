@@ -22,7 +22,7 @@
   "oauth2-configuration": {
     "token-validity": 3600,
     "redirect-uris": [
-      "https://material-risk-agent.cfapps.ap20.hana.ondemand.com/**"
+      "https://material-risk-agent.cfapps.<your-region>.hana.ondemand.com/**"
     ]
   }
 }
