@@ -60,8 +60,12 @@ modules:
       build-result: .
     properties:
       AGENT_URL: ~{agent-api/agent-url}
+      # Own public URL — used as the OAuth2 redirect_uri in the XSUAA login flow.
+      # Set SESSION_SECRET separately: cf set-env material-risk-ui SESSION_SECRET <random>
+      UI_PUBLIC_URL: ${default-url}
     requires:
       - name: agent-api
+      - name: material-risk-xsuaa
 
 resources:
   # SAP AI Core — LLM via Generative AI Hub. _boot.py maps the binding's
