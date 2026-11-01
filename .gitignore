@@ -17,7 +17,7 @@ mta_archives/
 # Secrets — never commit
 **/.env
 **/*.env
-**/BAI-AICore-Credentials*
+**/*AICore-Credentials*
 
 # Python
 **/__pycache__/
