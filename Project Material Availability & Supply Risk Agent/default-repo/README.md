@@ -10,14 +10,16 @@ client as the starting point for their build.
 ```
 default-repo/
 ├── assets/agent-starter-kit/         ← Python A2A agent (rename to your agent name)
-├── assets/agent-starter-kit-ui/      ← chat UI
-├── governance/
-│   └── agent_checklist_L0_to_L10.md   ← governance checklist
-├── docs/
-│   ├── data_readiness_questionnaire.md
-│   └── client_kickoff_email.md
-├── manifest.yml                 ← CF deployment (parameterized)
-└── deploy.sh                    ← CF push helper (prompts for domain)
+│   ├── app/                          ← agent code (main, agent, graph, config, s4_client)
+│   ├── xs-security.json              ← XSUAA scopes/roles
+│   ├── Procfile                      ← CF start command (web: python app/_boot.py)
+│   ├── runtime.txt                   ← pinned Python (full patch version)
+│   └── requirements.txt
+├── assets/agent-starter-kit-ui/      ← Joule-style chat UI
+├── agent_checklist_L0_to_L10.md      ← governance checklist
+├── mta.yaml                          ← CF deployment descriptor (MTA / mtar)
+├── deploy.sh                         ← build + deploy helper (mbt build → cf deploy)
+└── .gitignore
 ```
 
 ---
@@ -41,25 +43,44 @@ service instances (`VCAP_SERVICES`) / BTP Destinations, never a committed file.
 
 ---
 
-## Deploy to Cloud Foundry
+## Deploy to Cloud Foundry (MTA / mtar)
+
+Deployment uses the Multi-Target Application (MTA) approach — `mbt build` produces an
+`.mtar` archive, then `cf deploy` pushes every module in one transaction. Routes are
+assigned automatically from your CF domain via `mta.yaml`'s `${default-url}`.
+
+Prerequisites: `cf` CLI, [`mbt`](https://github.com/SAP/cloud-mta-build-tool), the
+MultiApps plugin (`cf install-plugin multiapps`), and a live session (`cf login --sso`).
 
 ```bash
-# From the default-repo/ root (prompts for your CF domain):
+# From the default-repo/ root (runs preflight checks, then builds + deploys):
 ./deploy.sh
 
 # Or manually:
-CF_APP_DOMAIN=cfapps.<region>.hana.ondemand.com cf push -f manifest.yml
+mbt build
+cf deploy mta_archives/*.mtar --strategy rolling
 ```
+
+`mta.yaml` binds two managed services automatically: the **Destination Service**
+(`agent-destination`) and **XSUAA** (`agent-xsuaa`, scopes from `xs-security.json`).
+It deliberately does **not** bind AI Core as a service.
+
+After deploy, create the backend BTP Destinations in the BTP Cockpit (Connectivity →
+Destinations) — they can't live in `mta.yaml` because they reference credentials outside CF:
+
+- **`aicore`** — AI Core (Type HTTP, OAuth2ClientCredentials). The agent resolves the LLM
+  through this destination at runtime. Until it exists, the agent runs in mock mode (`IBD_TESTING=1`).
+- **S/4HANA** (e.g. `S4_AGENT_DEV`) — one destination per environment, resolved by `S4_DESTINATION`.
+
+Use **Check Connection** on each destination — it must return HTTP 200 before the agent can use it.
 
 ---
 
 ## Customise for your domain
 
-- Rename `assets/agent-starter-kit/` to your agent name (update `manifest.yml` to match)
+- Rename `assets/agent-starter-kit/` to your agent name (update `mta.yaml` module name + `path` to match)
 - Edit `assets/agent-starter-kit/app/agent.py` → replace the agent name and workflow in `get_system_prompt()`
-- Replace `mcp-mock.json` with your domain's mock tool responses
-- Add real tools in `assets/agent-starter-kit/app/tool_provider/agw.py`
-- Update `manifest.yml` agent/UI app names
+- Update the agent / UI module names and `ID` in `mta.yaml`
 
 ---
 
@@ -76,13 +97,13 @@ semantic recall. Selected via the `MEMORY_BACKEND` environment variable (default
 behind the same interface, selected when `MEMORY_BACKEND=hana`. Business logic and tests do
 not change. Use a technical user with an **INSERT/SELECT-only** role (append-only audit). On CF,
 bind a HANA (HDI-container / schema) service — credentials arrive via `VCAP_SERVICES`, never in a
-committed file. See `docs/data_readiness_questionnaire.md` for what to request from the client.
+committed file.
 
 ---
 
 ## Governance
 
-Review the [Agent Checklist](governance/agent_checklist_L0_to_L10.md) periodically through the build.
+Review the [Agent Checklist](agent_checklist_L0_to_L10.md) periodically through the build.
 
 Mandatory rules enforced:
 - Exactly 3 `@agent_*` decorators in `agent.py`

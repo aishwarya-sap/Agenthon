@@ -16,7 +16,7 @@ Full docs: repo-root `docs/` (specs, decisions/ADRs, checklists, HANDOFF).
 3. **No secrets in the repo** — `.env` (gitignored) / VCAP bindings only.
 4. **Never fabricate** SAP data: on a failed read, surface it (`_backend_error_report`) — don't guess.
 5. **LLM gating:** `IBD_TESTING` mocks *data*; the LLM is gated on `config.aicore_configured()`.
-6. **Keep tests green** before any `cf push`; coverage ≥ 70%.
+6. **Keep tests green** before any `cf deploy`; coverage ≥ 70%.
 
 ## Run
 ```bash

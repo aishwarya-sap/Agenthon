@@ -17,9 +17,8 @@
 │   └── material-risk-ui/           ← Chat UI (Node/Express)
 ├── docs/                           ← Integration guide, BTP checklist, flow diagrams
 ├── default-repo/                   ← Generic SAP agent starter kit (reusable template)
-├── manifest.yml                    ← CF deployment (parameterised domain)
-├── mta.yaml                        ← MTA deployment descriptor
-└── deploy.sh                       ← CF push helper
+├── mta.yaml                        ← MTA deployment descriptor (mbt build → cf deploy)
+└── deploy.sh                       ← build + deploy helper
 ```
 
 ---
@@ -70,18 +69,18 @@ IBD_TESTING=1 pytest prebuilt_tests tests -q
 
 ## Deploy to Cloud Foundry
 
+Deployment uses the MTA approach — `mbt build` produces an `.mtar`, then `cf deploy`
+pushes every module and binds its services in one transaction. Routes are assigned
+automatically from your CF domain via `mta.yaml`'s `${default-url}`.
+
 ```bash
-# Stop running agent first (frees CF org memory quota)
-cf stop material-risk-agent
+# From the agent root (runs preflight checks, then builds + deploys):
+./deploy.sh
 
-# Push agent + UI
-cf push
-
-# Restart agent
-cf start material-risk-agent
+# Or manually (needs cf, mbt, the MultiApps plugin, and cf login --sso):
+mbt build
+cf deploy mta_archives/*.mtar --strategy rolling
 ```
-
-Set `CF_APP_DOMAIN` in your shell or replace in `manifest.yml` before pushing.
 
 ---
 

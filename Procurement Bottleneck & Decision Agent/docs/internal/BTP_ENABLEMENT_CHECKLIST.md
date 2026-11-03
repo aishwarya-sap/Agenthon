@@ -9,9 +9,9 @@ Legend: `[ ]` to do · **Gate** = don't proceed until this passes · Owner in (b
 ---
 
 ### Phase A — Agent + real data (no identity yet)
-- [ ] A1. `cf push` the agent to our CF space; `GET /.well-known/agent.json` returns the card. (us) **Gate: card resolves.**
+- [ ] A1. `mbt build` + `cf deploy mta_archives/*.mtar` to our CF space; `GET /.well-known/agent.json` returns the card. (us) **Gate: card resolves.**
 - [ ] A2. Set `SAP_MODE=accelerator_hub`, `S4_BASE_URL`, `S4_API_KEY` (env only); run an analysis turn → report built from **real** sandbox data. (us) **Gate: real PO/supplier data in the report.**
-- [x] A3. Joule-style chat UI stood up (served at the agent's root URL, no `/ui` suffix) so a functional consultant can click through the CF agent before Joule is ready. (us) **Done — redeploy with `cf push` to pick it up.**
+- [x] A3. Joule-style chat UI stood up (served at the agent's root URL, no `/ui` suffix) so a functional consultant can click through the CF agent before Joule is ready. (us) **Done — redeploy with `cf deploy` to pick it up.**
 - [ ] A4. Functional consultant signs off on the agent's output quality. (consultant)
 
 ### Phase B — Identity + Joule (hop 1)

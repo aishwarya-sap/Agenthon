@@ -91,11 +91,9 @@ cd assets/material-risk-ui && npm install && AGENT_URL=http://localhost:5000 npm
 ## 5. Deploy (Cloud Foundry, us10)
 
 ```bash
-# From the agent directory (NOT the repo root — root manifest diff currently 500s on CF):
-cd assets/material-risk-agent
-cf stop material-risk-agent        # free the 1 GB quota before push
-cf push material-risk-agent
-cf push material-risk-ui
+# From the agent root (the folder containing mta.yaml):
+mbt build
+cf deploy mta_archives/*.mtar --strategy rolling   # --strategy rolling keeps the old version serving while the new one stages
 
 # Verify
 curl https://material-risk-agent.cfapps.<region>.hana.ondemand.com/.well-known/agent-card.json

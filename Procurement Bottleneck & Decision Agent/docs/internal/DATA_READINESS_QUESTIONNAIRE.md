@@ -116,7 +116,7 @@ with optional Vector Engine semantic recall. Confirm so this can be provisioned.
 
 ## What our environment will provide
 
-- Agent source code in `default-repo/` (shared via git) — ready to clone and `cf push`
+- Agent source code in `default-repo/` (shared via git) — ready to clone and `mbt build` + `cf deploy`
 - CF app URL for functional SPOC testing (mock data, no SAP connection needed)
 - Step-by-step guide for Basis team: Cloud Connector setup + OData service activation
 - IAS admin mail template for Sprint 3 prerequisites

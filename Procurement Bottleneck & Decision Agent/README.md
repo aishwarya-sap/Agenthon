@@ -23,7 +23,7 @@ assets/procurement-bottleneck-agent/
   demo/index.html standalone mock-mode demo UI ("DEMO — MOCK DATA")
   tests/          72 tests (unit + integration + server), coverage 91.6%
   mcp-mock.json   deterministic offline fixtures (seed: supplier silent on critical-path steel)
-  asset.yaml · manifest.yml · xs-security.json · .env.example
+  asset.yaml · mta.yaml · xs-security.json · .env.example
 ```
 
 ## Run & verify (offline, no SAP / no credentials)
@@ -56,7 +56,7 @@ Secrets are never in the repo. Bind the AI Core service key from your secure cre
 cd "assets/procurement-bottleneck-agent"
 cf login -a https://api.cf.<your-region>.hana.ondemand.com --sso   # always --sso
 
-# Services (names match manifest.yml)
+# Services (names declared in mta.yaml)
 cf create-service aicore <plan> procurement-agent-aicore
 cf create-service xsuaa application procurement-agent-xsuaa -c xs-security.json
 
@@ -69,7 +69,8 @@ cf set-env procurement-bottleneck-agent AICORE_BASE_URL      "<serviceurls.AI_AP
 # Production uses live SAP data — unset mock:
 cf unset-env procurement-bottleneck-agent IBD_TESTING
 
-cf push
+mbt build
+cf deploy mta_archives/*.mtar --strategy rolling
 curl https://procurement-bottleneck-agent.cfapps.<your-region>.hana.ondemand.com/.well-known/agent.json
 ```
 Then register the agent-card URL in Joule (admin UI or `joule deploy`). See

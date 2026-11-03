@@ -137,7 +137,7 @@ AI Core (LLM), optional Destination + Connectivity (on-prem), optional HANA Clou
 
 ### 8.2 Deployment Topology
 
-CF app `material-risk-agent` (1 GB, `python app/_boot.py`) + CF app `material-risk-ui` (Node, proxies via `AGENT_URL`). Deploy via `manifest.yml` / `mta.yaml`.
+CF app `material-risk-agent` (1 GB, `python app/_boot.py`) + CF app `material-risk-ui` (Node, proxies via `AGENT_URL`). Deploy via `mta.yaml` (`mbt build` → `cf deploy`).
 
 ## 9. Testing
 

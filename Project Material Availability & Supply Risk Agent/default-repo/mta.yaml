@@ -1,0 +1,73 @@
+_schema-version: "3.3.0"
+ID: agent-starter-kit-mta
+version: 1.0.0
+description: SAP A2A Agent + Joule-style Chat UI
+
+modules:
+
+  # ── Agent (Python) ──────────────────────────────────────────────
+  - name: agent-starter-kit
+    type: python
+    path: assets/agent-starter-kit
+    parameters:
+      buildpack: python_buildpack
+      # 1G, not 512M: langchain + langgraph need the headroom. Drop to 512M only for a
+      # no-LLM echo agent that never imports them.
+      memory: 1G
+      disk-quota: 1G
+      health-check-type: http
+      health-check-http-endpoint: /.well-known/agent.json
+    build-parameters:
+      builder: custom
+      # Do NOT pip-install locally. The CF python_buildpack installs requirements.txt at
+      # staging using the runtime.txt-pinned Python. Just package the module dir.
+      commands:
+        - echo "deps installed by CF python_buildpack from requirements.txt at staging"
+      build-result: .
+    properties:
+      HOST: 0.0.0.0
+      AGENT_PUBLIC_URL: ${default-url}
+      # Ships in mock mode: with no AI Core destination configured the agent runs offline on
+      # mock data (no credentials needed). Remove IBD_TESTING once the `aicore` BTP destination
+      # is created (see "Post-deploy" in the README) to enable real LLM calls.
+      IBD_TESTING: "1"
+    provides:
+      - name: agent-api
+        properties:
+          agent-url: ${default-url}
+    requires:
+      - name: agent-destination
+      - name: agent-xsuaa
+
+  # ── Chat UI (Node.js Express) ────────────────────────────────────
+  - name: agent-starter-kit-ui
+    type: nodejs
+    path: assets/agent-starter-kit-ui
+    parameters:
+      buildpack: nodejs_buildpack
+      memory: 256M
+      disk-quota: 512M
+    build-parameters:
+      builder: npm
+      build-result: .
+    properties:
+      AGENT_URL: ~{agent-api/agent-url}
+    requires:
+      - name: agent-api
+
+resources:
+  # Destination Service — the runtime resolver for ALL backend credentials (AI Core, S/4HANA,
+  # the Joule-facing URL). AI Core connectivity goes through this at runtime — it is NOT bound
+  # here as a managed `aicore` service (that would create a duplicate credential path).
+  - name: agent-destination
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: destination
+      service-plan: lite
+  # XSUAA — secures the agent's A2A HTTP endpoints. Scopes/roles defined in xs-security.json.
+  - name: agent-xsuaa
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: xsuaa
+      service-plan: broker
+      path: ./assets/agent-starter-kit/xs-security.json

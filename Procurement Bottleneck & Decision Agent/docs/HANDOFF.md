@@ -40,9 +40,9 @@ IBD_TESTING=1 python -m app     # serves on :8080
 ## 5. Deploy (Cloud Foundry)
 
 ```bash
-cd assets/procurement-bottleneck-agent
+# from the agent root (the folder containing mta.yaml)
 cf login --sso
-cf push                         # manifest.yml: command `python -m app`, health /health
+mbt build && cf deploy mta_archives/*.mtar --strategy rolling   # mta.yaml declares modules + services
 # secrets via cf set-env (never committed): S4_API_KEY, AICORE_*, IAS_*
 ```
 

@@ -9,7 +9,7 @@ Legend: `[ ]` to do · **Gate** = don't proceed until this passes · Owner in (b
 ---
 
 ### Phase A — Agent + real data (no identity yet)
-- [ ] A1. `cf push -f manifest.yml` to our CF space; `GET /.well-known/agent.json` returns the card. (us) **Gate: card resolves, protocolVersion 0.3.0.**
+- [ ] A1. `mbt build` + `cf deploy mta_archives/*.mtar` to our CF space; `GET /.well-known/agent.json` returns the card. (us) **Gate: card resolves, protocolVersion 0.3.0.**
 - [ ] A2. Set `IBD_LIVE_S4=1`, `S4_SERVICE_PROFILE=cloud`, `S4_BASE_URL`, `S4_API_KEY` (env only); run an analysis turn → report built from **real** sandbox data. (us) **Gate: real stock/PO/supplier data in the report.**
 - [ ] A3. The custom chat UI (`material-risk-ui`) is up so a functional consultant can click through the CF agent before Joule is ready. (us)
 - [ ] A4. Functional consultant signs off on the agent's output quality. (consultant)

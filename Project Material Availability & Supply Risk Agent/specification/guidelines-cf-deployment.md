@@ -16,11 +16,11 @@ Two MTA modules from one `mta.yaml`:
 These are added into the **agent** asset folder. Without them the build silently uses the
 wrong defaults and fails at runtime, not build time — which is why they are automated.
 
-### `runtime.txt` → `python-3.11.x`
+### `runtime.txt` → `python-3.11.14`
 
 The CF `python_buildpack` defaults to **Python 3.10**. `sap-cloud-sdk` (and other SAP
 packages the agent pulls in) require **≥ 3.11**. Without `runtime.txt` the app installs
-but crashes on import. Pinning `python-3.11.x` fixes it.
+but crashes on import. Pinning `python-3.11.14` fixes it.
 
 ### `Procfile` → `web: python app/_boot.py` (LLM agent) · `web: python app/main.py` (no-LLM echo)
 

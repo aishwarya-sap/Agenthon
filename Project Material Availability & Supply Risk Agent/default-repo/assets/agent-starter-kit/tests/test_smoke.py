@@ -22,15 +22,6 @@ def test_agent_card_is_importable():
     assert "top=100" in prompt
 
 
-def test_mock_tools_load():
-    """tool_provider/agw.py returns at least one mock tool when IBD_TESTING=1."""
-    import asyncio
-    from app.tool_provider.agw import get_mcp_tools
-    tools = asyncio.run(get_mcp_tools())
-    assert len(tools) >= 1
-    assert all(hasattr(t, "name") for t in tools)
-
-
 def test_config_mock_mode():
     """config.is_mock_mode() returns True when IBD_TESTING=1."""
     from app.config import is_mock_mode

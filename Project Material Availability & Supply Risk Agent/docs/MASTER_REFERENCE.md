@@ -102,7 +102,7 @@ Project Material Availability & Supply Risk Agent/
 │   │   ├── mcp-mock.json        # Declarative tool catalog (15 tools, 3 servers)
 │   │   ├── .env.example         # Local dev env template
 │   │   ├── requirements.txt     # Python deps (no sap-cloud-sdk — SAP runtime only)
-│   │   └── runtime.txt          # python-3.11.x (CF buildpack)
+│   │   └── runtime.txt          # python-3.11.14 (CF buildpack)
 │   └── material-risk-ui/        # Joule-style Express chat UI
 │       ├── server.js            # Express + http-proxy-middleware → agent
 │       └── public/              # index.html, style.css, app.js

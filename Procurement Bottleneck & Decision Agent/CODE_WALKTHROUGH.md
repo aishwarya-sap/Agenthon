@@ -125,7 +125,7 @@ Three layers:
 | HITL checkpoints | `hitl.py` | `CHECKPOINT_REGISTRY` list |
 | Report sections | `agent.py::_build_report()` | Adjust the 7-section Markdown template |
 | S/4 OData base URL | `s4_client.py` + `.env` | `S4_BASE_URL`, `S4_API_KEY` |
-| CF app name | `manifest.yml` | `name:` field |
+| CF app name | `mta.yaml` | module `name:` field |
 
 ---
 

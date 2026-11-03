@@ -1,11 +1,4 @@
 import os
-from pathlib import Path
-
-try:
-    from dotenv import load_dotenv
-    load_dotenv(Path(__file__).parent.parent / ".env", override=False)
-except Exception:
-    pass
 
 try:
     from sap_cloud_sdk.aicore import set_aicore_config

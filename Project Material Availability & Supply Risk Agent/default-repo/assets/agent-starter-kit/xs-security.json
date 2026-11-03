@@ -1,0 +1,11 @@
+{
+  "xsappname": "agent-starter-kit",
+  "tenant-mode": "dedicated",
+  "scopes": [
+    { "name": "$XSAPPNAME.read", "description": "Read access" },
+    { "name": "$XSAPPNAME.write", "description": "Write access (HITL-gated)" }
+  ],
+  "role-templates": [
+    { "name": "AgentUser", "scope-references": ["$XSAPPNAME.read"] }
+  ]
+}

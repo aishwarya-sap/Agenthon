@@ -8,7 +8,6 @@ from a2a.utils import new_agent_text_message, new_task
 from a2a.utils.errors import ServerError
 
 from agent import SampleAgent
-from tool_provider.agw import get_mcp_tools
 
 logger = logging.getLogger(__name__)
 
@@ -24,13 +23,8 @@ class AgentExecutor(A2AAgentExecutor):
             task = new_task(context.message)
             await event_queue.enqueue_event(task)
 
+        # No external tools wired in this template for now.
         tools = []
-        try:
-            tools = await get_mcp_tools()
-            if tools:
-                logger.info("Loaded %d tool(s): %s", len(tools), [t.name for t in tools])
-        except Exception as exc:
-            logger.error("Failed to load tools: %s", exc)
 
         updater = TaskUpdater(event_queue, task.id, task.context_id)
 

@@ -107,7 +107,7 @@ Three layers: system-prompt MANDATORY RULE ("never execute write or delete opera
 | HITL write gate | `app/domain/hitl.py` | gated tool list |
 | S/4 service names | `app/config.py` | `cloud` / `onprem` profile maps |
 | S/4 base URL + key | `.env` | `S4_BASE_URL`, `S4_API_KEY` |
-| CF app name / routes | `manifest.yml` / `mta.yaml` | `name:` + routes |
+| CF app name / routes | `mta.yaml` | module `name:` + `${default-url}` routes |
 
 ---
 

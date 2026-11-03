@@ -76,7 +76,7 @@ For Joule integration (can be done after the CF demo is working):
 
 ### Step 4 — Create the `aicore-creds` user-provided service
 
-This project ships AI Core credentials via `.env` + `cf push` (see Part 2) — the
+This project ships AI Core credentials via `.env` + `cf deploy` (see Part 2) — the
 simplest path, and the one the sibling agents use. The alternative below (a bound
 user-provided service) is only needed if you prefer secrets in CF's vault instead
 of the pushed `.env`. **Either way, never put real credentials in a tracked file** —
@@ -96,7 +96,7 @@ cf create-user-provided-service aicore-creds -p '{
 ```
 
 > **Security note:** credentials belong only in `.env` (git-ignored) or CF's encrypted
-> vault — never in a tracked file. The default `manifest.yml` path reads them from the
+> vault — never in a tracked file. The default `mta.yaml` path reads them from the
 > pushed `.env`; no UPS is required.
 
 ---
@@ -331,7 +331,7 @@ Use `Authentication: OAuth2SAMLBearerAssertion` in the BTP destination instead. 
 
 | Symptom | Most likely cause | Fix |
 |---------|-------------------|-----|
-| `cf push` fails on buildpack | Node/Python version mismatch | Check `runtime.txt` (must be `python-3.11.x`) and `package.json` engines |
+| `cf deploy` fails on buildpack | Node/Python version mismatch | Check `runtime.txt` (must be `python-3.11.14`) and `package.json` engines |
 | Agent card returns 503 | `sap_cloud_sdk` import error at boot | Check CF logs: `cf logs material-risk-agent --recent`; the try/except shim should catch it |
 | Joule shows "no capability matched" | Scenario description too narrow | Edit `material_risk_capability/scenarios/material_risk_scenario.yaml` — broaden intent description |
 | Destination check fails (HTTP 401) | Missing `x_user_token.jwks_uri` or wrong audience | Re-check destination Additional Properties |

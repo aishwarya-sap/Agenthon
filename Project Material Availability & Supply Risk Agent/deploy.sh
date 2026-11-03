@@ -1,50 +1,44 @@
 #!/usr/bin/env bash
-# deploy.sh — push Material Risk Agent + Chat UI to Cloud Foundry
+# deploy.sh — build the MTA archive and deploy Material Risk Agent + Chat UI to Cloud Foundry.
 # Usage: ./deploy.sh
-# Or:    CF_APP_DOMAIN=cfapps.<region>.hana.ondemand.com ./deploy.sh
+#
+# Routes are assigned automatically from your CF domain via mta.yaml's ${default-url}.
+# Prerequisites: cf CLI, mbt, the MultiApps plugin (cf install-plugin multiapps),
+# and a live CF session (cf login --sso).
 
 set -euo pipefail
 
-# ── CF domain ─────────────────────────────────────────────────────────────────
-if [[ -z "${CF_APP_DOMAIN:-}" ]]; then
-  echo ""
-  echo "Enter your CF app domain (e.g. cfapps.<region>.hana.ondemand.com):"
-  echo ""
-  read -rp "CF_APP_DOMAIN: " CF_APP_DOMAIN
+# ── Prerequisite checks ─────────────────────────────────────────────────────────
+command -v cf  >/dev/null 2>&1 || { echo "ERROR: cf CLI not found."; exit 1; }
+command -v mbt >/dev/null 2>&1 || { echo "ERROR: mbt not found. Install the Cloud MTA Build Tool."; exit 1; }
+
+if ! cf plugins | grep -qi multiapps; then
+  echo "ERROR: MultiApps plugin missing. Run: cf install-plugin multiapps"
+  exit 1
 fi
 
-export CF_APP_DOMAIN
-
-echo ""
-echo "Deploying Material Risk Agent to: $CF_APP_DOMAIN"
-
-# ── CF login check ────────────────────────────────────────────────────────────
-if ! cf target &>/dev/null; then
-  echo ""
-  echo "ERROR: Not logged in to CF."
-  echo "Run: cf login -a https://api.cf.${CF_APP_DOMAIN#cfapps.}"
+# `cf target` prints a CACHED org/space even when the token is expired — hit the API to confirm.
+if ! cf services >/dev/null 2>&1; then
+  echo "ERROR: No live CF session (token missing/expired). Run: cf login --sso"
   exit 1
 fi
 
 echo ""
 cf target
-
 echo ""
-echo "Agent URL (after deploy):  https://material-risk-agent.${CF_APP_DOMAIN}/"
-echo "UI URL (after deploy):     https://material-risk-ui.${CF_APP_DOMAIN}/"
-echo ""
-read -rp "Continue? (y/N): " CONFIRM
+read -rp "Continue with build + deploy to the target above? (y/N): " CONFIRM
 [[ "${CONFIRM:-n}" =~ ^[Yy]$ ]] || { echo "Aborted."; exit 0; }
 
-# ── Push ──────────────────────────────────────────────────────────────────────
+# ── Build the MTA archive ───────────────────────────────────────────────────────
 echo ""
-echo "Running: cf push -f manifest.yml"
-cf push -f manifest.yml
+echo "Building MTA archive (mbt build)..."
+mbt build
+
+# ── Deploy ──────────────────────────────────────────────────────────────────────
+echo ""
+echo "Deploying mta_archives/*.mtar ..."
+cf deploy mta_archives/*.mtar --strategy rolling
 
 echo ""
 echo "Deployed. Checking app status..."
-cf apps | grep -E "material-risk"
-
-echo ""
-echo "Agent card:  curl https://material-risk-agent.${CF_APP_DOMAIN}/.well-known/agent.json"
-echo "UI:          https://material-risk-ui.${CF_APP_DOMAIN}/"
+cf apps | grep -E "material-risk" || true
